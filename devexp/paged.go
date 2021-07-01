@@ -12,23 +12,23 @@ import (
 )
 
 type Paged struct {
-	logFunc string
-	col     *mongo.Collection
-	opts    *options.LoadOptions
-	filter  bson.M
+	LogFunc string
+	Col     *mongo.Collection
+	Opts    *options.LoadOptions
+	Filter  bson.M
 }
 
 func (m *Paged) Find(decode interface{}) (total int64) {
-	logger := log.GetLogger(log.LoggerOpts{FuncName: m.logFunc})
+	logger := log.GetLogger(log.LoggerOpts{FuncName: m.LogFunc})
 	page := m.pageNo()
 	filter := m.makeFilter()
-	pg := pagination.New(m.col)
+	pg := pagination.New(m.Col)
 
-	logger.Debugf("page: %v, take: %v, filter: %+v, sort: %+v", page, m.opts.Take, filter, m.opts.Sort)
+	logger.Debugf("page: %v, take: %v, filter: %+v, sort: %+v", page, m.Opts.Take, filter, m.Opts.Sort)
 
-	fillSort(pg, m.opts.Sort)
+	fillSort(pg, m.Opts.Sort)
 
-	paged, err := pg.Limit(m.opts.Take).Page(page).Filter(filter).Decode(decode).Find()
+	paged, err := pg.Limit(m.Opts.Take).Page(page).Filter(filter).Decode(decode).Find()
 	if err != nil {
 		panic(err)
 	}
@@ -39,12 +39,12 @@ func (m *Paged) Find(decode interface{}) (total int64) {
 }
 
 func (m *Paged) GroupBy(group []*options.Group, decode interface{}) (data []bson.Raw, total int64) {
-	logger := log.GetLogger(log.LoggerOpts{FuncName: m.logFunc})
+	logger := log.GetLogger(log.LoggerOpts{FuncName: m.LogFunc})
 	page := m.pageNo()
 	filter := m.makeFilter()
-	pg := pagination.New(m.col)
+	pg := pagination.New(m.Col)
 
-	logger.Debugf("page: %v, take: %v, filter: %+v, sort: %+v, group: %+v", page, m.opts.Take, filter, m.opts.Sort, group)
+	logger.Debugf("page: %v, take: %v, filter: %+v, sort: %+v, group: %+v", page, m.Opts.Take, filter, m.Opts.Sort, group)
 
 	pipeline := []interface{}{bson.M{
 		"$match": filter,
@@ -64,7 +64,7 @@ func (m *Paged) GroupBy(group []*options.Group, decode interface{}) (data []bson
 	grpLast := len(grpSel) - 1
 
 	sortBy := bson.M{}
-	for _, s := range m.opts.Sort {
+	for _, s := range m.Opts.Sort {
 		sortBy[s.GetField()] = s.GetOrder()
 	}
 
@@ -94,7 +94,7 @@ func (m *Paged) GroupBy(group []*options.Group, decode interface{}) (data []bson
 
 	pipeline = append(pipeline, bson.M{"$project": grpProj})
 
-	ag, err := pg.Limit(m.opts.Take).Page(page).Aggregate(pipeline...)
+	ag, err := pg.Limit(m.Opts.Take).Page(page).Aggregate(pipeline...)
 	if err != nil {
 		panic(err)
 	}
@@ -106,13 +106,13 @@ func (m *Paged) GroupBy(group []*options.Group, decode interface{}) (data []bson
 }
 
 func (m *Paged) pageNo() int64 {
-	return m.opts.Skip/m.opts.Take + 1
+	return m.Opts.Skip/m.Opts.Take + 1
 }
 
 func (m *Paged) makeFilter() bson.M {
-	filter := m.opts.ParseFilter()
-	if m.filter != nil {
-		for k, v := range m.filter {
+	filter := m.Opts.ParseFilter()
+	if m.Filter != nil {
+		for k, v := range m.Filter {
 			filter[k] = v
 		}
 	}
