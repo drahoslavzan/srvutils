@@ -11,14 +11,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type paged struct {
+type Paged struct {
 	logFunc string
 	col     *mongo.Collection
 	opts    *options.LoadOptions
 	filter  bson.M
 }
 
-func (m *paged) Find(decode interface{}) (total int64) {
+func (m *Paged) Find(decode interface{}) (total int64) {
 	logger := log.GetLogger(log.LoggerOpts{FuncName: m.logFunc})
 	page := m.pageNo()
 	filter := m.makeFilter()
@@ -38,7 +38,7 @@ func (m *paged) Find(decode interface{}) (total int64) {
 	return
 }
 
-func (m *paged) GroupBy(group []*options.Group, decode interface{}) (data []bson.Raw, total int64) {
+func (m *Paged) GroupBy(group []*options.Group, decode interface{}) (data []bson.Raw, total int64) {
 	logger := log.GetLogger(log.LoggerOpts{FuncName: m.logFunc})
 	page := m.pageNo()
 	filter := m.makeFilter()
@@ -105,11 +105,11 @@ func (m *paged) GroupBy(group []*options.Group, decode interface{}) (data []bson
 	return
 }
 
-func (m *paged) pageNo() int64 {
+func (m *Paged) pageNo() int64 {
 	return m.opts.Skip/m.opts.Take + 1
 }
 
-func (m *paged) makeFilter() bson.M {
+func (m *Paged) makeFilter() bson.M {
 	filter := m.opts.ParseFilter()
 	if m.filter != nil {
 		for k, v := range m.filter {
