@@ -9,12 +9,28 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type Logger interface {
+	Fatal(err error)
+	Panic(err error)
+	Error(msg string)
+	Warn(msg string)
+	Info(msg string)
+	Debug(msg string)
+
+	Fatalf(format string, args ...interface{})
+	Panicf(format string, args ...interface{})
+	Errorf(format string, args ...interface{})
+	Warnf(format string, args ...interface{})
+	Infof(format string, args ...interface{})
+	Debugf(format string, args ...interface{})
+}
+
 type LoggerOpts struct {
 	FuncName string
 	Fields   map[string]interface{}
 }
 
-type serviceLogger struct {
+type logger struct {
 	*logrus.Entry
 }
 
@@ -35,7 +51,7 @@ func init() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 }
 
-func GetLogger(opts ...LoggerOpts) *serviceLogger {
+func GetLogger(opts ...LoggerOpts) Logger {
 	var o LoggerOpts
 	if len(opts) > 0 {
 		o = opts[0]
@@ -48,7 +64,55 @@ func GetLogger(opts ...LoggerOpts) *serviceLogger {
 		fs[k] = v
 	}
 
-	return &serviceLogger{logrus.WithFields(fs)}
+	return &logger{logrus.WithFields(fs)}
+}
+
+func (m *logger) Fatal(err error) {
+	m.Fatal(err)
+}
+
+func (m *logger) Panic(err error) {
+	m.Panic(err)
+}
+
+func (m *logger) Error(msg string) {
+	m.Error(msg)
+}
+
+func (m *logger) Warn(msg string) {
+	m.Warn(msg)
+}
+
+func (m *logger) Info(msg string) {
+	m.Info(msg)
+}
+
+func (m *logger) Debug(msg string) {
+	m.Debug(msg)
+}
+
+func (m *logger) Fatalf(format string, args ...interface{}) {
+	m.Fatalf(format, args)
+}
+
+func (m *logger) Panicf(format string, args ...interface{}) {
+	m.Panicf(format, args)
+}
+
+func (m *logger) Errorf(format string, args ...interface{}) {
+	m.Errorf(format, args)
+}
+
+func (m *logger) Warnf(format string, args ...interface{}) {
+	m.Warnf(format, args)
+}
+
+func (m *logger) Infof(format string, args ...interface{}) {
+	m.Infof(format, args)
+}
+
+func (m *logger) Debugf(format string, args ...interface{}) {
+	m.Debugf(format, args)
 }
 
 func getFields(funcName string) logrus.Fields {
