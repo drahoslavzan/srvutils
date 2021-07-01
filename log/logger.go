@@ -12,7 +12,7 @@ import (
 type Logger interface {
 	Fatal(err error)
 	Panic(err error)
-	Error(msg string)
+	Error(err error)
 	Warn(msg string)
 	Info(msg string)
 	Debug(msg string)
@@ -68,51 +68,51 @@ func GetLogger(opts ...LoggerOpts) Logger {
 }
 
 func (m *logger) Fatal(err error) {
-	m.Fatal(err)
+	m.Entry.Fatal(err)
 }
 
 func (m *logger) Panic(err error) {
-	m.Panic(err)
+	m.Entry.Panic(err)
 }
 
-func (m *logger) Error(msg string) {
-	m.Error(msg)
+func (m *logger) Error(err error) {
+	m.Entry.Error(err)
 }
 
 func (m *logger) Warn(msg string) {
-	m.Warn(msg)
+	m.Entry.Warn(msg)
 }
 
 func (m *logger) Info(msg string) {
-	m.Info(msg)
+	m.Entry.Info(msg)
 }
 
 func (m *logger) Debug(msg string) {
-	m.Debug(msg)
+	m.Entry.Debug(msg)
 }
 
 func (m *logger) Fatalf(format string, args ...interface{}) {
-	m.Fatalf(format, args)
+	m.Entry.Fatalf(format, args...)
 }
 
 func (m *logger) Panicf(format string, args ...interface{}) {
-	m.Panicf(format, args)
+	m.Entry.Panicf(format, args...)
 }
 
 func (m *logger) Errorf(format string, args ...interface{}) {
-	m.Errorf(format, args)
+	m.Entry.Errorf(format, args...)
 }
 
 func (m *logger) Warnf(format string, args ...interface{}) {
-	m.Warnf(format, args)
+	m.Entry.Warnf(format, args...)
 }
 
 func (m *logger) Infof(format string, args ...interface{}) {
-	m.Infof(format, args)
+	m.Entry.Infof(format, args...)
 }
 
 func (m *logger) Debugf(format string, args ...interface{}) {
-	m.Debugf(format, args)
+	m.Entry.Debugf(format, args...)
 }
 
 func getFields(funcName string) logrus.Fields {
