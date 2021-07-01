@@ -20,9 +20,10 @@ func GetEnv(key string) string {
 }
 
 func GetIntEnv(key string) int {
-	num, err := strconv.Atoi(GetEnv(key))
+	val := GetEnv(key)
+	num, err := strconv.Atoi(val)
 	if err != nil {
-		panic(fmt.Errorf("invalid env value for '%s': %v", key, num))
+		panic(fmt.Errorf("invalid env value for '%s': %v", key, val))
 	}
 	return num
 }
