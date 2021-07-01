@@ -3,6 +3,7 @@ package env
 import (
 	"fmt"
 	"os"
+	"strconv"
 )
 
 func IsProduction() bool {
@@ -16,4 +17,12 @@ func GetEnv(key string) string {
 		panic(fmt.Errorf("missing env value for '%s'", key))
 	}
 	return val
+}
+
+func GetIntEnv(key string) int {
+	num, err := strconv.Atoi(GetEnv(key))
+	if err != nil {
+		panic(fmt.Errorf("invalid env value for '%s': %v", key, num))
+	}
+	return num
 }
