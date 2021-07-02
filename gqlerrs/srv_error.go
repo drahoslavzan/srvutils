@@ -12,7 +12,6 @@ type srvError struct {
 }
 
 type SrvError interface {
-	error
 	Code() string
 	Fields() map[string]interface{}
 	Graph() *gqlerror.Error
