@@ -50,7 +50,7 @@ func parseFilterList(fl []interface{}) bson.M {
 		if fl[0] != "!" {
 			panic(fmt.Errorf("invalid unary operator: %v", fl[0]))
 		}
-		return bson.M{"$not": parseFilter(fl[1])}
+		return bson.M{"$nor": []bson.M{parseFilter(fl[1])}}
 	}
 
 	if sz == 3 {
