@@ -14,6 +14,7 @@ type srvError struct {
 type SrvError interface {
 	Code() string
 	Fields() map[string]interface{}
+	Plain() error
 	Graph() *gqlerror.Error
 }
 
@@ -32,14 +33,14 @@ func (m *srvError) Fields() map[string]interface{} {
 	return m.fields
 }
 
-func (m *srvError) Error() string {
+func (m *srvError) Plain() error {
 	if len(m.code) > 0 {
 		if len(m.fields) > 0 {
-			return fmt.Sprintf("%s: %v", m.code, m.fields)
+			return fmt.Errorf("%s: %v", m.code, m.fields)
 		}
-		return fmt.Sprintf("%s", m.code)
+		return fmt.Errorf("%s", m.code)
 	}
-	return fmt.Sprintf("%v", m.fields)
+	return fmt.Errorf("%v", m.fields)
 }
 
 func (m *srvError) Graph() *gqlerror.Error {
