@@ -114,6 +114,7 @@ func (m *Paged) makeFilter() bson.M {
 	if m.Filter != nil {
 		for k, v := range m.Filter {
 			if pv, ok := filter[k]; ok {
+				delete(filter, k)
 				filter["$and"] = []interface{}{
 					bson.M{k: v},
 					bson.M{k: pv},
