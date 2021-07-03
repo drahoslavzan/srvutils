@@ -15,6 +15,14 @@ func IsDevelopment() bool {
 	return !IsProduction()
 }
 
+func EnvType() string {
+	if IsProduction() {
+		return "production"
+	}
+
+	return "development"
+}
+
 func GetEnv(key string) string {
 	val := os.Getenv(key)
 	if len(val) < 1 {
