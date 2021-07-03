@@ -43,7 +43,7 @@ type callInfo struct {
 
 func init() {
 	if env.IsProduction() {
-		logrus.SetLevel(logrus.WarnLevel)
+		logrus.SetLevel(logrus.InfoLevel)
 	} else {
 		logrus.SetLevel(logrus.DebugLevel)
 	}
