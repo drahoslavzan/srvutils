@@ -2,6 +2,7 @@ package devexp
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/drahoslavzan/srvutils/devexp/options"
 	"github.com/drahoslavzan/srvutils/env"
@@ -60,8 +61,10 @@ func (m *Paged) GroupBy(group []*options.Group, decode interface{}) (data []bson
 	var grpSel bson.D
 	var grpSelInd bson.D
 	for _, g := range group {
-		grpSel = append(grpSel, primitive.E{g.Selector, "$" + g.Selector})
-		grpSelInd = append(grpSelInd, primitive.E{g.Selector, "$_id." + g.Selector})
+		// MongoDB cannot use '.' as a field name in aggregation
+		sel := strings.ReplaceAll(g.Selector, ".", "_")
+		grpSel = append(grpSel, primitive.E{sel, "$" + g.Selector})
+		grpSelInd = append(grpSelInd, primitive.E{sel, "$_id." + g.Selector})
 		grpProj[projID] = 0
 		projID = "items." + projID
 	}
