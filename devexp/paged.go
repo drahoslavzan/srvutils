@@ -61,10 +61,9 @@ func (m *Paged) GroupBy(group []*options.Group, decode interface{}) (data []bson
 	var grpSel bson.D
 	var grpSelInd bson.D
 	for _, g := range group {
-		// MongoDB cannot use '.' as a field name in aggregation
-		sel := strings.ReplaceAll(g.Selector, ".", "_")
+		sel := getDbKeyName(g.Selector)
 		grpSel = append(grpSel, primitive.E{sel, "$" + g.Selector})
-		grpSelInd = append(grpSelInd, primitive.E{sel, "$_id." + g.Selector})
+		grpSelInd = append(grpSelInd, primitive.E{sel, "$_id." + sel})
 		grpProj[projID] = 0
 		projID = "items." + projID
 	}
@@ -155,4 +154,9 @@ func fillSort(pg pagination.PagingQuery, sorts []options.Sort) {
 	for _, s := range sorts {
 		pg.Sort(s.GetField(), s.GetOrder())
 	}
+}
+
+func getDbKeyName(selector string) string {
+	// MongoDB cannot use '.' as a field name in aggregation
+	return strings.ReplaceAll(selector, ".", "_")
 }
