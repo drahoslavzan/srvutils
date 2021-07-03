@@ -51,14 +51,6 @@ func (m *Paged) GroupBy(group []*options.Group, decode interface{}) (data []bson
 	filter := m.makeFilter()
 	pg := pagination.New(m.Col)
 
-	if env.IsDevelopment() {
-		f, _ := json.MarshalIndent(filter, "", "  ")
-		g, _ := json.MarshalIndent(group, "", "  ")
-		logger.Debugf("page: %v, take: %v, sort: %+v", page, m.Opts.Take, m.Opts.Sort)
-		logger.Debugf("filter: %s", f)
-		logger.Debugf("group: %s", g)
-	}
-
 	pipeline := []interface{}{bson.M{
 		"$match": filter,
 	}}
@@ -106,6 +98,16 @@ func (m *Paged) GroupBy(group []*options.Group, decode interface{}) (data []bson
 	}
 
 	pipeline = append(pipeline, bson.M{"$project": grpProj})
+
+	if env.IsDevelopment() {
+		f, _ := json.MarshalIndent(filter, "", "  ")
+		g, _ := json.MarshalIndent(group, "", "  ")
+		p, _ := json.MarshalIndent(pipeline, "", "  ")
+		logger.Debugf("page: %v, take: %v, sort: %+v", page, m.Opts.Take, m.Opts.Sort)
+		logger.Debugf("filter: %s", f)
+		logger.Debugf("group: %s", g)
+		logger.Debugf("pipeline: %s", p)
+	}
 
 	ag, err := pg.Limit(m.Opts.Take).Page(page).Aggregate(pipeline...)
 	if err != nil {
