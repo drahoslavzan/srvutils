@@ -53,8 +53,10 @@ func (m *Paged) GroupBy(group []*options.Group, decode interface{}) (data []bson
 
 	if env.IsDevelopment() {
 		f, _ := json.MarshalIndent(filter, "", "  ")
-		logger.Debugf("page: %v, take: %v, sort: %+v, group: %+v", page, m.Opts.Take, m.Opts.Sort, group)
+		g, _ := json.MarshalIndent(group, "", "  ")
+		logger.Debugf("page: %v, take: %v, sort: %+v", page, m.Opts.Take, m.Opts.Sort)
 		logger.Debugf("filter: %s", f)
+		logger.Debugf("group: %s", g)
 	}
 
 	pipeline := []interface{}{bson.M{
