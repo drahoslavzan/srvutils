@@ -7,8 +7,7 @@ import (
 )
 
 func IsProduction() bool {
-	isProd := os.Getenv("PRODUCTION")
-	return isProd == "true"
+	return os.Getenv("DEVELOPMENT") == "true"
 }
 
 func IsDevelopment() bool {
