@@ -1,7 +1,10 @@
 package devexp
 
 import (
+	"encoding/json"
+
 	"github.com/drahoslavzan/srvutils/devexp/options"
+	"github.com/drahoslavzan/srvutils/env"
 	"github.com/drahoslavzan/srvutils/log"
 
 	pagination "github.com/gobeam/mongo-go-pagination"
@@ -24,7 +27,11 @@ func (m *Paged) Find(decode interface{}) (total int64) {
 	filter := m.makeFilter()
 	pg := pagination.New(m.Col)
 
-	logger.Debugf("page: %v, take: %v, filter: %+v, sort: %+v", page, m.Opts.Take, filter, m.Opts.Sort)
+	if env.IsDevelopment() {
+		f, _ := json.MarshalIndent(filter, "", "  ")
+		logger.Debugf("page: %v, take: %v, sort: %+v", page, m.Opts.Take, m.Opts.Sort)
+		logger.Debugf("  - filter: %s", f)
+	}
 
 	fillSort(pg, m.Opts.Sort)
 
@@ -44,7 +51,11 @@ func (m *Paged) GroupBy(group []*options.Group, decode interface{}) (data []bson
 	filter := m.makeFilter()
 	pg := pagination.New(m.Col)
 
-	logger.Debugf("page: %v, take: %v, filter: %+v, sort: %+v, group: %+v", page, m.Opts.Take, filter, m.Opts.Sort, group)
+	if env.IsDevelopment() {
+		f, _ := json.MarshalIndent(filter, "", "  ")
+		logger.Debugf("page: %v, take: %v, sort: %+v, group: %+v", page, m.Opts.Take, m.Opts.Sort, group)
+		logger.Debugf("  - filter: %s", f)
+	}
 
 	pipeline := []interface{}{bson.M{
 		"$match": filter,
