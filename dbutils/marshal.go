@@ -2,7 +2,7 @@ package dbutils
 
 import "go.mongodb.org/mongo-driver/bson"
 
-func struct2bson(s interface{}) bson.M {
+func ToBson(s interface{}) bson.M {
 	data, err := bson.Marshal(s)
 	if err != nil {
 		panic(err)
