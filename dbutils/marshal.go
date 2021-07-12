@@ -8,11 +8,17 @@ func ToBson(s interface{}) bson.M {
 		panic(err)
 	}
 
-	var replace bson.M
-	err = bson.Unmarshal(data, &replace)
+	var ret bson.M
+	err = bson.Unmarshal(data, &ret)
 	if err != nil {
 		panic(err)
 	}
 
-	return replace
+	return ret
+}
+
+func ToBsonNoID(s interface{}) bson.M {
+	ret := ToBson(s)
+	delete(ret, "_id")
+	return ret
 }
