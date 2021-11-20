@@ -125,7 +125,6 @@ func getFields(funcName string) logrus.Fields {
 	return logrus.Fields{
 		"function": funcName,
 		"package":  ci.packageName,
-		"service":  env.GetEnv("SERVICE_NAME"),
 	}
 }
 
