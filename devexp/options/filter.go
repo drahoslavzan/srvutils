@@ -63,15 +63,16 @@ func (m *LoadOptions) parseFilterList(fl []interface{}) bson.M {
 		}
 		field := m.parseField(fl[0])
 		operand := fl[2]
-		var err error
 		if operand != nil {
+			var err error
+			os := operand.(string)
 			if field.IsID {
-				if operand, err = primitive.ObjectIDFromHex(operand.(string)); err != nil {
+				if operand, err = primitive.ObjectIDFromHex(os); err != nil {
 					panic(fmt.Errorf("invalid object id provided: %v", operand))
 				}
 			} else if field.IsDate {
-				if operand, err = time.Parse(dateFmt, operand.(string)); err != nil {
-					panic(fmt.Errorf("invalid date provided: %v", operand))
+				if operand, err = time.Parse(dateFmt, os); err != nil {
+					panic(fmt.Errorf("invalid date provided: %v", os))
 				}
 			}
 		}
@@ -165,6 +166,7 @@ func parseExpression(operator, operand interface{}) bson.M {
 func parseOperand(op string, val interface{}) bson.M {
 	switch v := val.(type) {
 	case nil:
+	case bool:
 	case int:
 	case float64:
 	case string:
