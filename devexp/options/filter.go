@@ -99,6 +99,10 @@ func (m *LoadOptions) parseField(val interface{}) *Field {
 			f = Field{
 				Name: v,
 			}
+		} else {
+			if len(f.Name) < 1 {
+				f.Name = v
+			}
 		}
 		m := dateFieldRegex.FindStringSubmatch(f.Name)
 		if m != nil {
