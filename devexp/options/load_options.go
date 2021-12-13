@@ -6,9 +6,8 @@ type Sort struct {
 }
 
 type Field struct {
-	Name   string `json:"name"`
-	IsDate bool   `json:"isDate"`
-	IsID   bool   `json:"isID"`
+	Name      string `json:"name"`
+	Serialize func(val interface{}) interface{}
 }
 
 type LoadOptions struct {

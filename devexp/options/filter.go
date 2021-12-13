@@ -14,8 +14,6 @@ type Filter interface{}
 // index for field has to be created
 var dateFieldRegex = regexp.MustCompile(`^([^.]+)\.(year|quarter|month|dayofweek|day)$`)
 
-const dateFmt = "2006-01-02T15:04:05-07:00"
-
 func (m *LoadOptions) ParseFilter() bson.M {
 	if m.Field == nil {
 		m.Field = map[string]Field{}
@@ -63,18 +61,8 @@ func (m *LoadOptions) parseFilterList(fl []interface{}) bson.M {
 		}
 		field := m.parseField(fl[0])
 		operand := fl[2]
-		if operand != nil {
-			var err error
-			os := operand.(string)
-			if field.IsID {
-				if operand, err = primitive.ObjectIDFromHex(os); err != nil {
-					panic(fmt.Errorf("invalid object id provided: %v", operand))
-				}
-			} else if field.IsDate {
-				if operand, err = time.Parse(dateFmt, os); err != nil {
-					panic(fmt.Errorf("invalid date provided: %v", os))
-				}
-			}
+		if field.Serialize != nil {
+			operand = field.Serialize(operand)
 		}
 		return bson.M{field.Name: parseExpression(fl[1], operand)}
 	}
@@ -170,6 +158,7 @@ func parseOperand(op string, val interface{}) bson.M {
 	case int:
 	case float64:
 	case string:
+	case time.Time:
 	case primitive.ObjectID:
 	default:
 		panic(fmt.Errorf("invalid operand: %v", v))
