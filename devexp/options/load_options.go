@@ -5,16 +5,25 @@ type Sort struct {
 	Desc     bool   `json:"desc"`
 }
 
-type LoadOptions struct {
-	Skip   int64  `json:"skip"`
-	Take   int64  `json:"take"`
-	Filter Filter `json:"filter"`
-	Sort   []Sort `json:"sort"`
+type Field struct {
+	Name   string `json:"name"`
+	IsDate bool   `json:"isDate"`
+	IsID   bool   `json:"isID"`
 }
 
-func (m *Sort) GetField() string {
-	if m.Selector == "id" {
-		return "_id"
+type LoadOptions struct {
+	Skip   int64            `json:"skip"`
+	Take   int64            `json:"take"`
+	Filter Filter           `json:"filter"`
+	Sort   []Sort           `json:"sort"`
+	Field  map[string]Field `json:"field"`
+}
+
+func (m *Sort) GetField(opts *LoadOptions) string {
+	if opts.Field != nil {
+		if f, ok := opts.Field[m.Selector]; ok && len(f.Name) > 0 {
+			return f.Name
+		}
 	}
 	return m.Selector
 }

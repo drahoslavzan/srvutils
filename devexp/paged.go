@@ -34,7 +34,7 @@ func (m *Paged) Find(decode interface{}) (total int64) {
 		logger.Debugf("filter: %s", f)
 	}
 
-	fillSort(pg, m.Opts.Sort)
+	fillSort(pg, m.Opts)
 
 	paged, err := pg.Limit(m.Opts.Take).Page(page).Filter(filter).Decode(decode).Find()
 	if err != nil {
@@ -72,7 +72,7 @@ func (m *Paged) GroupBy(group []*options.Group, decode interface{}) (data []bson
 
 	sortBy := bson.M{}
 	for _, s := range m.Opts.Sort {
-		sortBy[s.GetField()] = s.GetOrder()
+		sortBy[s.GetField(m.Opts)] = s.GetOrder()
 	}
 
 	pipeline = append(pipeline, bson.M{"$sort": sortBy})
@@ -145,14 +145,14 @@ func (m *Paged) makeFilter() bson.M {
 	return filter
 }
 
-func fillSort(pg pagination.PagingQuery, sorts []options.Sort) {
-	if len(sorts) < 1 {
+func fillSort(pg pagination.PagingQuery, opts *options.LoadOptions) {
+	if len(opts.Sort) < 1 {
 		pg.Sort("_id", 1)
 		return
 	}
 
-	for _, s := range sorts {
-		pg.Sort(s.GetField(), s.GetOrder())
+	for _, s := range opts.Sort {
+		pg.Sort(s.GetField(opts), s.GetOrder())
 	}
 }
 
