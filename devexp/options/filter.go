@@ -11,7 +11,7 @@ import (
 
 type Filter interface{}
 
-// index for field has to be created
+// index for a field has to be created
 var dateFieldRegex = regexp.MustCompile(`^([^.]+)\.(year|quarter|month|dayofweek|day)$`)
 
 func (m *LoadOptions) ParseFilter() bson.M {
