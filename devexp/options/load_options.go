@@ -16,6 +16,7 @@ type LoadOptions struct {
 	Filter Filter           `json:"filter"`
 	Sort   []Sort           `json:"sort"`
 	Field  map[string]Field `json:"field"`
+	Search *string          `json:"search"` // collection must have text index
 }
 
 func (m *Sort) GetField(opts *LoadOptions) string {

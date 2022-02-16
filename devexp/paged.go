@@ -130,6 +130,13 @@ func (m *Paged) pageNo() int64 {
 
 func (m *Paged) makeFilter() bson.M {
 	filter := m.Opts.ParseFilter()
+
+	if m.Opts.Search != nil {
+		filter["$text"] = bson.M{
+			"$search": *m.Opts.Search,
+		}
+	}
+
 	if m.Filter != nil {
 		for k, v := range m.Filter {
 			if pv, ok := filter[k]; ok {
