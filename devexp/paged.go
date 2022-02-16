@@ -13,6 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	mopts "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Paged struct {
@@ -20,6 +21,7 @@ type Paged struct {
 	Col     *mongo.Collection
 	Opts    *options.LoadOptions
 	Filter  bson.M
+	Locale  *string
 }
 
 func (m *Paged) Find(decode interface{}) (total int64) {
@@ -34,7 +36,7 @@ func (m *Paged) Find(decode interface{}) (total int64) {
 		logger.Debugf("filter: %s", f)
 	}
 
-	fillSort(pg, m.Opts)
+	m.fillSort(pg, m.Opts)
 
 	paged, err := pg.Limit(m.Opts.Take).Page(page).Filter(filter).Decode(decode).Find()
 	if err != nil {
@@ -145,12 +147,18 @@ func (m *Paged) makeFilter() bson.M {
 	return filter
 }
 
-func fillSort(pg pagination.PagingQuery, opts *options.LoadOptions) {
+func (m *Paged) fillSort(pg pagination.PagingQuery, opts *options.LoadOptions) {
 	if len(opts.Sort) < 1 {
 		pg.Sort("_id", 1)
 		return
 	}
 
+	locale := "en"
+	if m.Locale != nil {
+		locale = *m.Locale
+	}
+
+	pg.SetCollation(&mopts.Collation{Locale: locale})
 	for _, s := range opts.Sort {
 		pg.Sort(s.GetField(opts), s.GetOrder())
 	}
