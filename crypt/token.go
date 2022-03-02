@@ -6,7 +6,7 @@ import (
 
 type Token string
 
-func Generate() Token {
+func GenerateToken() Token {
 	guid := uuid.New()
 	return Token(guid.String())
 }
