@@ -25,7 +25,7 @@ func EnvType() string {
 func GetEnv(key string) string {
 	val := os.Getenv(key)
 	if len(val) < 1 {
-		panic(fmt.Errorf("missing env value for '%s'", key))
+		panic(fmt.Errorf("missing env value: %s", key))
 	}
 	return val
 }
