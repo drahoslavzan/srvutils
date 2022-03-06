@@ -44,11 +44,11 @@ type callInfo struct {
 func init() {
 	if env.IsProduction() {
 		logrus.SetLevel(logrus.InfoLevel)
+		logrus.SetFormatter(&logrus.JSONFormatter{})
 	} else {
 		logrus.SetLevel(logrus.DebugLevel)
+		logrus.SetFormatter(&logrus.TextFormatter{})
 	}
-
-	logrus.SetFormatter(&logrus.JSONFormatter{})
 }
 
 func GetLogger(opts ...LoggerOpts) Logger {
