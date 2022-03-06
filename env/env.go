@@ -4,28 +4,13 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
-
-func IsProduction() bool {
-	return os.Getenv("PRODUCTION") == "true"
-}
-
-func IsDevelopment() bool {
-	return !IsProduction()
-}
-
-func EnvType() string {
-	if IsProduction() {
-		return "production"
-	}
-
-	return "development"
-}
 
 func GetEnv(key string) string {
 	val := os.Getenv(key)
 	if len(val) < 1 {
-		panic(fmt.Errorf("missing env value: %s", key))
+		panic(fmt.Errorf("missing env variable: %s", key))
 	}
 	return val
 }
@@ -38,11 +23,19 @@ func GetEnvOpt(key string) *string {
 	return &val
 }
 
+func GetEnvDef(key string, def string) string {
+	if v := GetEnvOpt(key); v == nil {
+		return def
+	} else {
+		return *v
+	}
+}
+
 func GetIntEnv(key string) int {
 	val := GetEnv(key)
 	num, err := strconv.Atoi(val)
 	if err != nil {
-		panic(fmt.Errorf("invalid env value for '%s': %v", key, val))
+		panic(fmt.Errorf("invalid integer value for env variable %s: %v", key, val))
 	}
 	return num
 }
@@ -53,4 +46,29 @@ func GetIntEnvOpt(key string) *int {
 	}
 	val := GetIntEnv(key)
 	return &val
+}
+
+func GetIntEnvDef(key string, def int) int {
+	if v := GetIntEnvOpt(key); v == nil {
+		return def
+	} else {
+		return *v
+	}
+}
+
+func GetEnvBool(key string) bool {
+	v := GetEnv(key)
+	return isTrue(v)
+}
+
+func GetEnvBoolDef(key string, def bool) bool {
+	if v := GetEnvOpt(key); v == nil {
+		return def
+	} else {
+		return isTrue(*v)
+	}
+}
+
+func isTrue(v string) bool {
+	return len(v) > 0 && v != "0" && strings.ToLower(v) != "false"
 }
