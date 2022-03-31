@@ -19,7 +19,7 @@ type (
 
 	Client interface {
 		Get(link string) (status int, body string, error error)
-		Post(link string, values map[string]string) (status int, body string, error error)
+		PostURLEncoded(link string, values map[string]string) (status int, body string, error error)
 	}
 
 	client struct {
@@ -27,7 +27,7 @@ type (
 	}
 )
 
-func NewClient(handler ClientHandler) *client {
+func NewClient(handler ClientHandler) Client {
 	return &client{handler}
 }
 
