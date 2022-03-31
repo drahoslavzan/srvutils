@@ -1,6 +1,8 @@
 package netcln
 
 import (
+	"bytes"
+	"encoding/json"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -43,6 +45,41 @@ func (m *client) Get(link string) (int, string, error) {
 
 func (m *client) PostURLEncoded(link string, values map[string]string) (int, string, error) {
 	res, err := m.handler.Do(getRequest("POST", link, values))
+	if err != nil {
+		return 0, "", err
+	}
+
+	text, err := getRespText(res)
+	return res.StatusCode, text, err
+}
+
+func (m *client) JSONRequest(method string, link string, data interface{}, headers map[string]string) (int, string, error) {
+	var body io.Reader
+	if data != nil {
+		js, err := json.Marshal(data)
+		if err != nil {
+			panic(err)
+		}
+		body = bytes.NewBuffer(js)
+	}
+
+	req, err := http.NewRequest(method, link, body)
+	if err != nil {
+		panic(err)
+	}
+
+	req.Header.Set("User-Agent", userAgent)
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
+
+	if headers != nil {
+		for k, v := range headers {
+			req.Header.Set(k, v)
+		}
+	}
+
+	res, err := m.handler.Do(req)
 	if err != nil {
 		return 0, "", err
 	}
