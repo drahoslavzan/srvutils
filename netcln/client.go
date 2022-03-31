@@ -22,6 +22,7 @@ type (
 	Client interface {
 		Get(link string) (status int, body string, error error)
 		PostURLEncoded(link string, values map[string]string) (status int, body string, error error)
+		JSONRequest(method, link string, data interface{}, headers map[string]string) (int, string, error)
 	}
 
 	client struct {
@@ -53,7 +54,7 @@ func (m *client) PostURLEncoded(link string, values map[string]string) (int, str
 	return res.StatusCode, text, err
 }
 
-func (m *client) JSONRequest(method string, link string, data interface{}, headers map[string]string) (int, string, error) {
+func (m *client) JSONRequest(method, link string, data interface{}, headers map[string]string) (int, string, error) {
 	var body io.Reader
 	if data != nil {
 		js, err := json.Marshal(data)
