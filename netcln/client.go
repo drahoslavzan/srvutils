@@ -20,9 +20,10 @@ type (
 	}
 
 	Client interface {
-		Get(link string) (status int, body string, error error)
+		Get(link string, headers map[string]string) (status int, body string, error error)
 		PostURLEncoded(link string, values map[string]string) (status int, body string, error error)
-		JSONRequest(method, link string, data interface{}, headers map[string]string) (int, string, error)
+		Send(method, link, data string, headers map[string]string) (int, string, error)
+		SendJSON(method, link string, data interface{}, headers map[string]string) (int, string, error)
 	}
 
 	client struct {
@@ -34,27 +35,31 @@ func NewClient(handler ClientHandler) Client {
 	return &client{handler}
 }
 
-func (m *client) Get(link string) (int, string, error) {
-	res, err := m.handler.Do(getRequest("GET", link, nil))
-	if err != nil {
-		return 0, "", err
-	}
-
-	text, err := getRespText(res)
-	return res.StatusCode, text, err
+func (m *client) Get(link string, headers map[string]string) (int, string, error) {
+	req := getRequest("GET", link, nil, headers)
+	return m.send(req)
 }
 
 func (m *client) PostURLEncoded(link string, values map[string]string) (int, string, error) {
-	res, err := m.handler.Do(getRequest("POST", link, values))
-	if err != nil {
-		return 0, "", err
+	vals := url.Values{}
+	for k, v := range values {
+		vals.Add(k, v)
 	}
 
-	text, err := getRespText(res)
-	return res.StatusCode, text, err
+	body := strings.NewReader(vals.Encode())
+	req := getRequest("POST", link, body, nil)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	return m.send(req)
 }
 
-func (m *client) JSONRequest(method, link string, data interface{}, headers map[string]string) (int, string, error) {
+func (m *client) Send(method, link, data string, headers map[string]string) (int, string, error) {
+	body := bytes.NewBufferString(data)
+	req := getRequest(method, link, body, headers)
+	return m.send(req)
+}
+
+func (m *client) SendJSON(method, link string, data interface{}, headers map[string]string) (int, string, error) {
 	var body io.Reader
 	if data != nil {
 		js, err := json.Marshal(data)
@@ -64,22 +69,13 @@ func (m *client) JSONRequest(method, link string, data interface{}, headers map[
 		body = bytes.NewBuffer(js)
 	}
 
-	req, err := http.NewRequest(method, link, body)
-	if err != nil {
-		panic(err)
-	}
+	req := getRequest(method, link, body, headers)
+	req.Header.Set("Content-Type", "application/json")
 
-	req.Header.Set("User-Agent", userAgent)
-	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
-	}
+	return m.send(req)
+}
 
-	if headers != nil {
-		for k, v := range headers {
-			req.Header.Set(k, v)
-		}
-	}
-
+func (m *client) send(req *http.Request) (int, string, error) {
 	res, err := m.handler.Do(req)
 	if err != nil {
 		return 0, "", err
@@ -89,24 +85,17 @@ func (m *client) JSONRequest(method, link string, data interface{}, headers map[
 	return res.StatusCode, text, err
 }
 
-func getRequest(method string, link string, values map[string]string) *http.Request {
-	var body io.Reader
-	if values != nil {
-		vals := url.Values{}
-		for k, v := range values {
-			vals.Add(k, v)
-		}
-		body = strings.NewReader(vals.Encode())
-	}
-
+func getRequest(method string, link string, body io.Reader, headers map[string]string) *http.Request {
 	req, err := http.NewRequest(method, link, body)
 	if err != nil {
 		panic(err)
 	}
 
 	req.Header.Set("User-Agent", userAgent)
-	if body != nil {
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	if headers != nil {
+		for k, v := range headers {
+			req.Header.Set(k, v)
+		}
 	}
 
 	return req
