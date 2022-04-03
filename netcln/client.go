@@ -40,6 +40,11 @@ func (m *client) Get(link string, headers map[string]string) (int, string, error
 	return m.send(req)
 }
 
+func (m *client) Delete(link string, headers map[string]string) (int, string, error) {
+	req := getRequest("DELETE", link, nil, headers)
+	return m.send(req)
+}
+
 func (m *client) PostURLEncoded(link string, values map[string]string) (int, string, error) {
 	vals := url.Values{}
 	for k, v := range values {
