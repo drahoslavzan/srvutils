@@ -21,6 +21,7 @@ type (
 
 	Client interface {
 		Get(link string, headers map[string]string) (status int, body string, error error)
+		Delete(link string, headers map[string]string) (status int, body string, error error)
 		PostURLEncoded(link string, values map[string]string) (status int, body string, error error)
 		Send(method, link, data string, headers map[string]string) (int, string, error)
 		SendJSON(method, link string, data interface{}, headers map[string]string) (int, string, error)
