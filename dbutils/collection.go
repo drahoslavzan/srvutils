@@ -9,7 +9,11 @@ import (
 )
 
 func Distinct[T any](mc *mongo.Collection, col string) []T {
-	res, err := mc.Distinct(context.Background(), col, bson.M{})
+	return DistinctFilter[T](mc, col, bson.M{})
+}
+
+func DistinctFilter[T any](mc *mongo.Collection, col string, filter interface{}) []T {
+	res, err := mc.Distinct(context.Background(), col, filter)
 	if err != nil {
 		log.GetLogger().Panicf("distinct on %s: %v", col, err)
 	}
