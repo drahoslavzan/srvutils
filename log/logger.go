@@ -26,10 +26,12 @@ type logger struct {
 func NewLogger(keysAndValues ...any) Logger {
 	var err error
 	var zl *zap.Logger
+
+	optClrSkip := zap.AddCallerSkip(1)
 	if env.IsProduction() {
-		zl, err = zap.NewProduction()
+		zl, err = zap.NewProduction(optClrSkip)
 	} else {
-		zl, err = zap.NewDevelopment()
+		zl, err = zap.NewDevelopment(optClrSkip)
 	}
 
 	if err != nil {
