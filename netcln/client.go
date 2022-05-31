@@ -24,7 +24,7 @@ type (
 		Delete(link string, headers map[string]string) (status int, body string, error error)
 		PostURLEncoded(link string, values map[string]string) (status int, body string, error error)
 		Send(method, link, data string, headers map[string]string) (int, string, error)
-		SendJSON(method, link string, data interface{}, headers map[string]string) (int, string, error)
+		SendJSON(method, link string, data any, headers map[string]string) (int, string, error)
 	}
 
 	client struct {
@@ -65,7 +65,7 @@ func (m *client) Send(method, link, data string, headers map[string]string) (int
 	return m.send(req)
 }
 
-func (m *client) SendJSON(method, link string, data interface{}, headers map[string]string) (int, string, error) {
+func (m *client) SendJSON(method, link string, data any, headers map[string]string) (int, string, error) {
 	var body io.Reader
 	if data != nil {
 		js, err := json.Marshal(data)

@@ -11,7 +11,7 @@ func Distinct[T any](mc *mongo.Collection, col string) []T {
 	return DistinctFilter[T](mc, col, bson.M{})
 }
 
-func DistinctFilter[T any](mc *mongo.Collection, col string, filter interface{}) []T {
+func DistinctFilter[T any](mc *mongo.Collection, col string, filter any) []T {
 	res, err := mc.Distinct(context.Background(), col, filter)
 	if err != nil {
 		panic(err)

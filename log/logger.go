@@ -12,18 +12,18 @@ type Logger interface {
 	Info(msg string)
 	Debug(msg string)
 
-	Panicw(err error, keysAndValues ...interface{})
-	Errorw(err error, keysAndValues ...interface{})
-	Warnw(msg string, keysAndValues ...interface{})
-	Infow(msg string, keysAndValues ...interface{})
-	Debugw(msg string, keysAndValues ...interface{})
+	Panicw(err error, keysAndValues ...any)
+	Errorw(err error, keysAndValues ...any)
+	Warnw(msg string, keysAndValues ...any)
+	Infow(msg string, keysAndValues ...any)
+	Debugw(msg string, keysAndValues ...any)
 }
 
 type logger struct {
 	z *zap.SugaredLogger
 }
 
-func NewLogger(keysAndValues ...interface{}) Logger {
+func NewLogger(keysAndValues ...any) Logger {
 	var err error
 	var zl *zap.Logger
 	if env.IsProduction() {
@@ -60,22 +60,22 @@ func (m *logger) Debug(msg string) {
 	m.z.Debug(msg)
 }
 
-func (m *logger) Panicw(err error, keysAndValues ...interface{}) {
+func (m *logger) Panicw(err error, keysAndValues ...any) {
 	m.z.Panicw(err.Error(), keysAndValues...)
 }
 
-func (m *logger) Errorw(err error, keysAndValues ...interface{}) {
+func (m *logger) Errorw(err error, keysAndValues ...any) {
 	m.z.Errorw(err.Error(), keysAndValues...)
 }
 
-func (m *logger) Warnw(msg string, keysAndValues ...interface{}) {
+func (m *logger) Warnw(msg string, keysAndValues ...any) {
 	m.z.Warnw(msg, keysAndValues...)
 }
 
-func (m *logger) Infow(msg string, keysAndValues ...interface{}) {
+func (m *logger) Infow(msg string, keysAndValues ...any) {
 	m.z.Infow(msg, keysAndValues...)
 }
 
-func (m *logger) Debugw(msg string, keysAndValues ...interface{}) {
+func (m *logger) Debugw(msg string, keysAndValues ...any) {
 	m.z.Debugw(msg, keysAndValues...)
 }

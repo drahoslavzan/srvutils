@@ -22,7 +22,7 @@ type Paged struct {
 	Locale *string
 }
 
-func (m *Paged) Find(decode interface{}) (total int64) {
+func (m *Paged) Find(decode any) (total int64) {
 	page := m.pageNo()
 	filter := m.makeFilter()
 	pg := pagination.New(m.Col)
@@ -46,12 +46,12 @@ func (m *Paged) Find(decode interface{}) (total int64) {
 	return
 }
 
-func (m *Paged) GroupBy(group []*options.Group, decode interface{}) (data []bson.Raw, total int64) {
+func (m *Paged) GroupBy(group []*options.Group, decode any) (data []bson.Raw, total int64) {
 	page := m.pageNo()
 	filter := m.makeFilter()
 	pg := pagination.New(m.Col)
 
-	pipeline := []interface{}{bson.M{
+	pipeline := []any{bson.M{
 		"$match": filter,
 	}}
 
@@ -137,7 +137,7 @@ func (m *Paged) makeFilter() bson.M {
 		for k, v := range m.Filter {
 			if pv, ok := filter[k]; ok {
 				delete(filter, k)
-				filter["$and"] = []interface{}{
+				filter["$and"] = []any{
 					bson.M{k: v},
 					bson.M{k: pv},
 				}

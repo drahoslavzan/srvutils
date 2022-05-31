@@ -7,7 +7,7 @@ type Sort struct {
 
 type Field struct {
 	Name      string `json:"name"`
-	Serialize func(val interface{}) interface{}
+	Serialize func(val any) any
 }
 
 type LoadOptions struct {

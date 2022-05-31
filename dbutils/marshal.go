@@ -2,7 +2,7 @@ package dbutils
 
 import "go.mongodb.org/mongo-driver/bson"
 
-func ToBson(s interface{}, del ...string) bson.M {
+func ToBson(s any, del ...string) bson.M {
 	data, err := bson.Marshal(s)
 	if err != nil {
 		panic(err)
@@ -21,6 +21,6 @@ func ToBson(s interface{}, del ...string) bson.M {
 	return ret
 }
 
-func ToBsonNoID(s interface{}) bson.M {
+func ToBsonNoID(s any) bson.M {
 	return ToBson(s, "_id")
 }

@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type Filter interface{}
+type Filter any
 
 // index for a field has to be created
 var dateFieldRegex = regexp.MustCompile(`^([^.]+)\.(year|quarter|month|dayofweek|day)$`)
@@ -21,13 +21,13 @@ func (m *LoadOptions) ParseFilter() bson.M {
 	return m.parseFilter(m.Filter)
 }
 
-func (m *LoadOptions) parseFilter(filter interface{}) bson.M {
+func (m *LoadOptions) parseFilter(filter Filter) bson.M {
 	if filter == nil {
 		return bson.M{}
 	}
 
 	switch v := filter.(type) {
-	case []interface{}:
+	case []any:
 		return m.parseFilterList(v)
 	case string:
 		return bson.M{m.parseField(v).Name: bson.M{"$eq": true}}
@@ -36,7 +36,7 @@ func (m *LoadOptions) parseFilter(filter interface{}) bson.M {
 	}
 }
 
-func (m *LoadOptions) parseFilterList(fl []interface{}) bson.M {
+func (m *LoadOptions) parseFilterList(fl []any) bson.M {
 	sz := len(fl)
 
 	if sz < 1 {
@@ -56,7 +56,7 @@ func (m *LoadOptions) parseFilterList(fl []interface{}) bson.M {
 	}
 
 	if sz == 3 {
-		if _, ok := fl[0].([]interface{}); ok {
+		if _, ok := fl[0].([]any); ok {
 			return m.parseFilterListChain(fl)
 		}
 		field := m.parseField(fl[0])
@@ -74,7 +74,7 @@ func (m *LoadOptions) parseFilterList(fl []interface{}) bson.M {
 	return m.parseFilterListChain(fl)
 }
 
-func (m *LoadOptions) parseFilterListChain(fl []interface{}) bson.M {
+func (m *LoadOptions) parseFilterListChain(fl []any) bson.M {
 	opds := []bson.M{}
 	expOperator := parseChainOperator(fl[1])
 	for i, elem := range fl {
@@ -91,7 +91,7 @@ func (m *LoadOptions) parseFilterListChain(fl []interface{}) bson.M {
 	return bson.M{expOperator: opds}
 }
 
-func (m *LoadOptions) parseField(val interface{}) *Field {
+func (m *LoadOptions) parseField(val any) *Field {
 	switch v := val.(type) {
 	case string:
 		f, ok := m.Field[v]
@@ -114,7 +114,7 @@ func (m *LoadOptions) parseField(val interface{}) *Field {
 	}
 }
 
-func parseChainOperator(val interface{}) string {
+func parseChainOperator(val any) string {
 	op, ok := val.(string)
 	if !ok || (op != "and" && op != "or") {
 		panic(fmt.Errorf("invalid logical operator provided: %v", op))
@@ -123,7 +123,7 @@ func parseChainOperator(val interface{}) string {
 	return "$" + op
 }
 
-func parseExpression(operator, operand interface{}) bson.M {
+func parseExpression(operator, operand any) bson.M {
 	op, ok := operator.(string)
 	if !ok {
 		panic(fmt.Errorf("invalid operator provided: %v", op))
@@ -155,7 +155,7 @@ func parseExpression(operator, operand interface{}) bson.M {
 	}
 }
 
-func parseOperand(op string, val interface{}) bson.M {
+func parseOperand(op string, val any) bson.M {
 	switch v := val.(type) {
 	case nil:
 	case bool:
@@ -171,7 +171,7 @@ func parseOperand(op string, val interface{}) bson.M {
 	return bson.M{op: val}
 }
 
-func parseRegex(format string, val interface{}) bson.M {
+func parseRegex(format string, val any) bson.M {
 	v, ok := val.(string)
 	if !ok {
 		panic(fmt.Errorf("invalid regex: %v", v))

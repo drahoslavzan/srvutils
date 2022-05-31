@@ -8,17 +8,17 @@ import (
 
 type srvError struct {
 	code   string
-	fields map[string]interface{}
+	fields map[string]any
 }
 
 type SrvError interface {
 	Code() string
-	Fields() map[string]interface{}
+	Fields() map[string]any
 	Plain() error
 	Graph() *gqlerror.Error
 }
 
-func MakeSrvError(code string, fields map[string]interface{}) SrvError {
+func MakeSrvError(code string, fields map[string]any) SrvError {
 	return &srvError{
 		code:   code,
 		fields: fields,
@@ -29,7 +29,7 @@ func (m *srvError) Code() string {
 	return m.code
 }
 
-func (m *srvError) Fields() map[string]interface{} {
+func (m *srvError) Fields() map[string]any {
 	return m.fields
 }
 
@@ -45,7 +45,7 @@ func (m *srvError) Plain() error {
 
 func (m *srvError) Graph() *gqlerror.Error {
 	return &gqlerror.Error{
-		Extensions: map[string]interface{}{
+		Extensions: map[string]any{
 			"ecode":  m.Code(),
 			"fields": m.Fields(),
 		},

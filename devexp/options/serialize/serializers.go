@@ -7,7 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func ID(val interface{}) interface{} {
+func ID(val any) any {
 	sv, ok := val.(string)
 	if !ok {
 		panic(fmt.Errorf("invalid object id: %v", val))
@@ -19,7 +19,7 @@ func ID(val interface{}) interface{} {
 	return ret
 }
 
-func Date(val interface{}) interface{} {
+func Date(val any) any {
 	sv, ok := val.(string)
 	if !ok {
 		panic(fmt.Errorf("invalid date provided: %v", val))
