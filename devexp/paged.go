@@ -1,11 +1,9 @@
 package devexp
 
 import (
-	"encoding/json"
 	"strings"
 
 	"github.com/drahoslavzan/srvutils/devexp/options"
-	"github.com/drahoslavzan/srvutils/env"
 	"github.com/drahoslavzan/srvutils/log"
 
 	pagination "github.com/gobeam/mongo-go-pagination"
@@ -17,30 +15,30 @@ import (
 )
 
 type Paged struct {
-	LogFunc string
-	Col     *mongo.Collection
-	Opts    *options.LoadOptions
-	Filter  bson.M
-	Locale  *string
+	Col    *mongo.Collection
+	Opts   *options.LoadOptions
+	Filter bson.M
+	Logger log.Logger
+	Locale *string
 }
 
 func (m *Paged) Find(decode interface{}) (total int64) {
-	logger := log.GetLogger(log.LoggerOpts{FuncName: m.LogFunc})
 	page := m.pageNo()
 	filter := m.makeFilter()
 	pg := pagination.New(m.Col)
 
-	if env.IsDevelopment() {
-		f, _ := json.MarshalIndent(filter, "", "  ")
-		logger.Debugf("page: %v, take: %v, sort: %+v", page, m.Opts.Take, m.Opts.Sort)
-		logger.Debugf("filter: %s", f)
-	}
+	m.Logger.Debugw("find",
+		"page", page,
+		"take", m.Opts.Take,
+		"sort", m.Opts.Sort,
+		"filter", filter,
+	)
 
 	m.fillSort(pg, m.Opts)
 
 	paged, err := pg.Limit(m.Opts.Take).Page(page).Filter(filter).Decode(decode).Find()
 	if err != nil {
-		panic(err)
+		m.Logger.Panic(err)
 	}
 
 	total = paged.Pagination.Total
@@ -49,7 +47,6 @@ func (m *Paged) Find(decode interface{}) (total int64) {
 }
 
 func (m *Paged) GroupBy(group []*options.Group, decode interface{}) (data []bson.Raw, total int64) {
-	logger := log.GetLogger(log.LoggerOpts{FuncName: m.LogFunc})
 	page := m.pageNo()
 	filter := m.makeFilter()
 	pg := pagination.New(m.Col)
@@ -103,19 +100,18 @@ func (m *Paged) GroupBy(group []*options.Group, decode interface{}) (data []bson
 
 	pipeline = append(pipeline, bson.M{"$project": grpProj})
 
-	if env.IsDevelopment() {
-		f, _ := json.MarshalIndent(filter, "", "  ")
-		g, _ := json.MarshalIndent(group, "", "  ")
-		p, _ := json.MarshalIndent(pipeline, "", "  ")
-		logger.Debugf("page: %v, take: %v, sort: %+v", page, m.Opts.Take, m.Opts.Sort)
-		logger.Debugf("filter: %s", f)
-		logger.Debugf("group: %s", g)
-		logger.Debugf("pipeline: %s", p)
-	}
+	m.Logger.Debugw("find",
+		"page", page,
+		"take", m.Opts.Take,
+		"sort", m.Opts.Sort,
+		"filter", filter,
+		"group", group,
+		"pipeline", pipeline,
+	)
 
 	ag, err := pg.Limit(m.Opts.Take).Page(page).Aggregate(pipeline...)
 	if err != nil {
-		panic(err)
+		m.Logger.Panic(err)
 	}
 
 	data = ag.Data
