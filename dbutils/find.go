@@ -2,7 +2,8 @@ package dbutils
 
 import (
 	"context"
-	"log"
+
+	"github.com/drahoslavzan/srvutils/log"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
