@@ -2,7 +2,7 @@ package dbutils
 
 import "go.mongodb.org/mongo-driver/bson"
 
-func ToBson(s any, del ...string) bson.M {
+func ToBson(s any, except ...string) bson.M {
 	data, err := bson.Marshal(s)
 	if err != nil {
 		panic(err)
@@ -14,7 +14,7 @@ func ToBson(s any, del ...string) bson.M {
 		panic(err)
 	}
 
-	for _, d := range del {
+	for _, d := range except {
 		delete(ret, d)
 	}
 
