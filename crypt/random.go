@@ -19,5 +19,5 @@ func MakeRandom(length int, charset string, prefix string) string {
 		b[i] = charset[seededRand.Intn(len(charset)-1)]
 	}
 
-	return string(b)
+	return prefix + string(b)
 }
