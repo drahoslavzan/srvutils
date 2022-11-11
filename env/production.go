@@ -1,11 +1,11 @@
 package env
 
 func IsProduction() bool {
-	return GetEnvBoolDef("PRODUCTION", false)
+	return !IsDevelopment()
 }
 
 func IsDevelopment() bool {
-	return !IsProduction()
+	return GetEnvBoolDef("ENV_DEVELOPMENT", false)
 }
 
 func EnvType() string {
