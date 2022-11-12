@@ -7,7 +7,7 @@ import (
 type Hash string
 
 func MakeHash(str string) Hash {
-	hash, err := bcrypt.GenerateFromPassword([]byte(str), bcrypt.MinCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(str), bcrypt.DefaultCost)
 	if err != nil {
 		panic(err)
 	}
