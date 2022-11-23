@@ -5,11 +5,13 @@ import (
 	"time"
 )
 
-var (
+const (
 	Alphabet     = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 	AlphaNum     = Alphabet + "0123456789"
 	AlphaSpecial = AlphaNum + "~`!@#$%^&*()_-+={[}]|\\:;\"'<,>.?/"
+)
 
+var (
 	seededRand = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 

@@ -19,20 +19,12 @@ type (
 		Do(*http.Request) (*http.Response, error)
 	}
 
-	Client interface {
-		Get(link string, headers map[string]string) (status int, body string, error error)
-		Delete(link string, headers map[string]string) (status int, body string, error error)
-		PostURLEncoded(link string, values map[string]string) (status int, body string, error error)
-		Send(method, link, data string, headers map[string]string) (int, string, error)
-		SendJSON(method, link string, data any, headers map[string]string) (int, string, error)
-	}
-
 	client struct {
 		handler ClientHandler
 	}
 )
 
-func NewClient(handler ClientHandler) Client {
+func NewClient(handler ClientHandler) *client {
 	return &client{handler}
 }
 

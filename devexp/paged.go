@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/drahoslavzan/srvutils/devexp/options"
-	"github.com/drahoslavzan/srvutils/log"
 
 	pagination "github.com/gobeam/mongo-go-pagination"
 
@@ -18,7 +17,6 @@ type Paged struct {
 	Col    *mongo.Collection
 	Opts   *options.LoadOptions
 	Filter bson.M
-	Logger log.Logger
 	Locale *string
 }
 
@@ -27,18 +25,11 @@ func (m *Paged) Find(decode any) (total int64) {
 	filter := m.makeFilter()
 	pg := pagination.New(m.Col)
 
-	m.Logger.Debugw("find",
-		"page", page,
-		"take", m.Opts.Take,
-		"sort", m.Opts.Sort,
-		"filter", filter,
-	)
-
 	m.fillSort(pg, m.Opts)
 
 	paged, err := pg.Limit(m.Opts.Take).Page(page).Filter(filter).Decode(decode).Find()
 	if err != nil {
-		m.Logger.Panic(err)
+		panic(err)
 	}
 
 	total = paged.Pagination.Total
@@ -100,18 +91,9 @@ func (m *Paged) GroupBy(group []*options.Group, decode any) (data []bson.Raw, to
 
 	pipeline = append(pipeline, bson.M{"$project": grpProj})
 
-	m.Logger.Debugw("find",
-		"page", page,
-		"take", m.Opts.Take,
-		"sort", m.Opts.Sort,
-		"filter", filter,
-		"group", group,
-		"pipeline", pipeline,
-	)
-
 	ag, err := pg.Limit(m.Opts.Take).Page(page).Aggregate(pipeline...)
 	if err != nil {
-		m.Logger.Panic(err)
+		panic(err)
 	}
 
 	data = ag.Data

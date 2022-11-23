@@ -3,37 +3,35 @@ package dbutils
 import (
 	"context"
 
-	"github.com/drahoslavzan/srvutils/log"
-
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func FindOne[T any](logger log.Logger, col *mongo.Collection, filter bson.M) *T {
+func FindOne[T any](col *mongo.Collection, filter bson.M) *T {
 	res := col.FindOne(context.Background(), filter)
-	return SingleResultValue[T](logger, res)
+	return SingleResultValue[T](res)
 }
 
-func UpdateOne[T any](logger log.Logger, col *mongo.Collection, filter, update bson.M) *T {
+func UpdateOne[T any](col *mongo.Collection, filter, update bson.M) *T {
 	opts := options.FindOneAndUpdate().
 		SetReturnDocument(options.After)
 
 	res := col.FindOneAndUpdate(context.Background(), filter, update, opts)
-	return SingleResultValue[T](logger, res)
+	return SingleResultValue[T](res)
 }
 
-func SingleResultValue[T any](logger log.Logger, res *mongo.SingleResult) *T {
+func SingleResultValue[T any](res *mongo.SingleResult) *T {
 	if err := res.Err(); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil
 		}
-		logger.Panic(err)
+		panic(err)
 	}
 
 	var ret T
 	if err := res.Decode(&ret); err != nil {
-		logger.Panic(err)
+		panic(err)
 	}
 
 	return &ret
