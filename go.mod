@@ -1,6 +1,6 @@
 module github.com/drahoslavzan/srvutils
 
-go 1.18
+go 1.19
 
 require (
 	github.com/gobeam/mongo-go-pagination v0.0.8
@@ -8,7 +8,7 @@ require (
 	github.com/vektah/gqlparser/v2 v2.5.1
 	go.mongodb.org/mongo-driver v1.11.0
 	go.uber.org/zap v1.23.0
-	golang.org/x/crypto v0.2.0
+	golang.org/x/crypto v0.3.0
 )
 
 require (
