@@ -5,10 +5,10 @@ func IsProduction() bool {
 }
 
 func IsDevelopment() bool {
-	return GetEnvBoolDef("ENV_DEVELOPMENT", false)
+	return BoolDef("ENV_DEVELOPMENT", false)
 }
 
-func EnvType() string {
+func Type() string {
 	if IsProduction() {
 		return "production"
 	}
