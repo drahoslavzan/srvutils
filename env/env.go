@@ -80,9 +80,9 @@ func BoolDef(key string, def bool) bool {
 
 func isTrue(k, v string) bool {
 	switch strings.ToLower(v) {
-	case "no", "false":
+	case "false", "no", "off", "0":
 		return false
-	case "yes", "true":
+	case "true", "yes", "on", "1":
 		return true
 	}
 
