@@ -61,12 +61,14 @@ func IntDef(key string, def int) int {
 	return def
 }
 
+// The unit (seconds, minutes, ...) of the duration returned is based on the name of the key.
 func Duration(key string) time.Duration {
 	d := durationForKey(key)
 
 	return d * time.Duration(Int(key))
 }
 
+// The unit (seconds, minutes, ...) of the duration returned is based on the name of the key.
 func DurationDef(key string, def int) time.Duration {
 	d := durationForKey(key)
 	if v := IntOpt(key); v != nil {
