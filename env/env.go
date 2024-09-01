@@ -13,6 +13,7 @@ func String(key string) string {
 	if len(val) < 1 {
 		panic(fmt.Errorf("missing env variable: %s", key))
 	}
+
 	return val
 }
 
@@ -21,6 +22,7 @@ func StringOpt(key string) *string {
 	if len(val) < 1 {
 		return nil
 	}
+
 	return &val
 }
 
@@ -28,6 +30,7 @@ func StringDef(key string, def string) string {
 	if v := StringOpt(key); v != nil {
 		return *v
 	}
+
 	return def
 }
 
@@ -37,6 +40,7 @@ func Int(key string) int {
 	if err != nil {
 		panic(fmt.Errorf("invalid integer value for env variable %s: %s", key, val))
 	}
+
 	return num
 }
 
@@ -45,6 +49,7 @@ func IntOpt(key string) *int {
 		val := Int(key)
 		return &val
 	}
+
 	return nil
 }
 
@@ -52,19 +57,23 @@ func IntDef(key string, def int) int {
 	if v := IntOpt(key); v != nil {
 		return *v
 	}
+
 	return def
 }
 
 func Duration(key string) time.Duration {
-	return time.Duration(Int(key))
+	d := durationForKey(key)
+
+	return d * time.Duration(Int(key))
 }
 
-func DurationDef(key string, def time.Duration) time.Duration {
+func DurationDef(key string, def int) time.Duration {
+	d := durationForKey(key)
 	if v := IntOpt(key); v != nil {
-		return time.Duration(*v)
+		return d * time.Duration(*v)
 	}
 
-	return def
+	return d * time.Duration(def)
 }
 
 func Bool(key string) bool {
@@ -75,6 +84,7 @@ func BoolDef(key string, def bool) bool {
 	if v := StringOpt(key); v != nil {
 		return isTrue(key, *v)
 	}
+
 	return def
 }
 
@@ -87,4 +97,25 @@ func isTrue(k, v string) bool {
 	}
 
 	panic(fmt.Errorf("invalid boolean value for env variable %s: %s", k, v))
+}
+
+func durationForKey(key string) time.Duration {
+	idx := strings.LastIndex(key, "_")
+	if idx < 0 {
+		panic(fmt.Errorf("invalid key: %s", key))
+	}
+
+	s := strings.ToLower(key[idx+1:])
+	switch s {
+	case "s", "secs", "seconds":
+		return time.Second
+	case "m", "mins", "minutes":
+		return time.Minute
+	case "h", "hrs", "hours":
+		return time.Hour
+	case "d", "days":
+		return 24 * time.Hour
+	}
+
+	panic(fmt.Errorf("invalid duration suffix for key %s: %s", key, s))
 }
