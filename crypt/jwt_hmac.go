@@ -9,16 +9,18 @@ import (
 
 type HMACSignerParser struct {
 	key []byte
+	exp time.Duration
 }
 
-func NewHMACSignerParser(symmetricKey []byte) *HMACSignerParser {
+func NewHMACSignerParser(symmetricKey []byte, exp time.Duration) *HMACSignerParser {
 	return &HMACSignerParser{
 		key: symmetricKey,
+		exp: exp,
 	}
 }
 
-func (m *HMACSignerParser) Sign(payload JWTClaims, exp time.Duration) (string, error) {
-	claims := makeClaims(payload, exp)
+func (m *HMACSignerParser) Sign(payload JWTClaims) (string, error) {
+	claims := makeClaims(payload, m.exp)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(m.key)
 }

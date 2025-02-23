@@ -12,6 +12,7 @@ import (
 type (
 	RSASigner struct {
 		priKey *rsa.PrivateKey
+		exp    time.Duration
 	}
 
 	RSAParser struct {
@@ -19,7 +20,7 @@ type (
 	}
 )
 
-func NewRSASigner(privateKey []byte) *RSASigner {
+func NewRSASigner(privateKey []byte, exp time.Duration) *RSASigner {
 	priKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKey)
 	if err != nil {
 		zap.L().Panic("invalid private key", zap.Error(err))
@@ -30,8 +31,8 @@ func NewRSASigner(privateKey []byte) *RSASigner {
 	}
 }
 
-func (m *RSASigner) Sign(payload JWTClaims, exp time.Duration) (string, error) {
-	claims := makeClaims(payload, exp)
+func (m *RSASigner) Sign(payload JWTClaims) (string, error) {
+	claims := makeClaims(payload, m.exp)
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
 	return token.SignedString(m.priKey)
 }
