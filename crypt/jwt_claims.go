@@ -3,6 +3,8 @@ package crypt
 import (
 	"time"
 
+	"maps"
+
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -40,9 +42,7 @@ func makeClaims(payload JWTClaims, exp time.Duration) jwt.MapClaims {
 		"exp": now.Add(exp).Unix(),
 	}
 
-	for k, v := range payload {
-		claims[k] = v
-	}
+	maps.Copy(claims, payload)
 
 	return claims
 }

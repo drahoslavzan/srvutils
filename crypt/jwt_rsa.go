@@ -28,6 +28,7 @@ func NewRSASigner(privateKey []byte, exp time.Duration) *RSASigner {
 
 	return &RSASigner{
 		priKey: priKey,
+		exp:    exp,
 	}
 }
 
