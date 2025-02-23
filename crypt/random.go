@@ -5,17 +5,21 @@ import (
 	"time"
 )
 
+type (
+	CharSet string
+)
+
 const (
-	Alphabet     = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-	AlphaNum     = Alphabet + "0123456789"
-	AlphaSpecial = AlphaNum + "~`!@#$%^&*()_-+={[}]|\\:;\"'<,>.?/"
+	Alphabet     CharSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+	AlphaNum     CharSet = Alphabet + "0123456789"
+	AlphaSpecial CharSet = AlphaNum + "~`!@#$%^&*()_-+={[}]|\\:;\"'<,>.?/"
 )
 
 var (
 	seededRand = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
-func MakeRandom(length int, charset string, prefix string) string {
+func MakeRandom(length int, charset CharSet, prefix string) string {
 	b := make([]byte, length)
 	for i := range b {
 		b[i] = charset[seededRand.Intn(len(charset)-1)]

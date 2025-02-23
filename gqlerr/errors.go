@@ -1,4 +1,4 @@
-package gqlerrs
+package gqlerr
 
 type Error struct {
 	Code    string
@@ -19,10 +19,11 @@ func NewCodeError(msg, code string) *Error {
 	}
 }
 
-func NewFieldError(msg, field string) *Error {
+func NewCodeFieldError(msg, code, field string) *Error {
 	return &Error{
-		Message: msg,
+		Code:    code,
 		Field:   field,
+		Message: msg,
 	}
 }
 

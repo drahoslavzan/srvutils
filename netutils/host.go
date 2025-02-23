@@ -6,9 +6,9 @@ import (
 	"strings"
 )
 
-func GetRemoteIP(r *http.Request, enableForwarding bool) string {
+func GetRemoteHost(r *http.Request, forwarding bool) string {
 	host, _, _ := net.SplitHostPort(r.RemoteAddr)
-	if !enableForwarding {
+	if !forwarding {
 		return host
 	}
 
