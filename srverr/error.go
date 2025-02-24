@@ -14,12 +14,14 @@ type Error struct {
 	Field   string
 }
 
+// Basic non-customer facing error message, e.g. log it and display generic error.
 func NewError(msg string) *Error {
 	return &Error{
 		Message: msg,
 	}
 }
 
+// Customer facing error message translatable using code.
 func NewCodeError(msg, code string) *Error {
 	return &Error{
 		Code:    code,
@@ -27,6 +29,7 @@ func NewCodeError(msg, code string) *Error {
 	}
 }
 
+// Customer facing error message for the provided field.
 func NewCodeFieldError(msg, code, field string) *Error {
 	return &Error{
 		Code:    code,
