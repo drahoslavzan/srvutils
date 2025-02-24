@@ -1,4 +1,4 @@
-package gqlerr
+package srverr
 
 import (
 	"context"
@@ -42,16 +42,16 @@ func (m *Error) Error() string {
 func (m *Error) FormatGQL(ctx context.Context) *gqlerror.Error {
 	e := graphql.DefaultErrorPresenter(ctx, m)
 
-	var ge *Error
-	if errors.As(e, &ge) {
-		e.Message = ge.Message
+	var se *Error
+	if errors.As(e, &se) {
+		e.Message = se.Message
 		e.Extensions = make(map[string]any)
 
-		if len(ge.Code) > 0 {
-			e.Extensions["code"] = ge.Code
+		if len(se.Code) > 0 {
+			e.Extensions["code"] = se.Code
 		}
-		if len(ge.Field) > 0 {
-			e.Extensions["field"] = ge.Field
+		if len(se.Field) > 0 {
+			e.Extensions["field"] = se.Field
 		}
 	}
 
