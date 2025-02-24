@@ -60,7 +60,7 @@ func (m *FBTParser) Parse(token string) (JWTClaims, error) {
 }
 
 func getGSAPubKey(id string) []byte {
-	gsaPubKeysMut.Lock()
+	gsaPubKeysMut.RLock()
 	defer gsaPubKeysMut.Unlock()
 
 	return []byte(gsaPubKeys[id])
