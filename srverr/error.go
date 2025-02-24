@@ -39,7 +39,7 @@ func (m *Error) Error() string {
 	return m.Message
 }
 
-func (m *Error) Format(ctx context.Context) *gqlerror.Error {
+func (m *Error) FormatGQL(ctx context.Context) *gqlerror.Error {
 	e := graphql.DefaultErrorPresenter(ctx, m)
 
 	var ge *Error
