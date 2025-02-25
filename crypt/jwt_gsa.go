@@ -27,7 +27,7 @@ func newGSATokenParser(url string) *gsaTokenParser {
 
 func (m *gsaTokenParser) KeyByID(id string) []byte {
 	m.mut.RLock()
-	defer m.mut.Unlock()
+	defer m.mut.RUnlock()
 
 	return []byte(m.pubKeys[id])
 }
