@@ -11,8 +11,12 @@ type (
 	}
 )
 
-func NewWatermillZapLogger(logger *zap.Logger) *WMZapLoggerAdapter {
+func NewWatermillZapLogger(logger *zap.Logger) watermill.LoggerAdapter {
 	return &WMZapLoggerAdapter{}
+}
+
+func (m *WMZapLoggerAdapter) With(fields watermill.LogFields) watermill.LoggerAdapter {
+	return NewWatermillZapLogger(m.logger.With(m.fields(fields)...))
 }
 
 func (m *WMZapLoggerAdapter) Error(msg string, err error, fields watermill.LogFields) {
