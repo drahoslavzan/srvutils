@@ -21,6 +21,8 @@ type (
 	}
 )
 
+const NoTTL = time.Duration(0)
+
 func NewRedisCache[T any](conn string, ttl time.Duration, vf ValueFactory[T], logger *zap.Logger) *KVCache[T] {
 	opts, err := redis.ParseURL(conn)
 	if err != nil {
@@ -63,6 +65,14 @@ func (m *KVCache[T]) Get(key string) *T {
 
 func (m *KVCache[T]) Set(key string, value T) {
 	err := m.client.Set(context.Background(), key, value, m.ttl).Err()
+	if err != nil {
+		m.logger.Error("redis set", zap.Error(err))
+		return
+	}
+}
+
+func (m *KVCache[T]) SetWithTTL(key string, value T, ttl time.Duration) {
+	err := m.client.Set(context.Background(), key, value, ttl).Err()
 	if err != nil {
 		m.logger.Error("redis set", zap.Error(err))
 		return
