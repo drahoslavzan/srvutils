@@ -8,6 +8,12 @@ import (
 	"time"
 )
 
+func Data(key string) []byte {
+	val := String(key)
+
+	return []byte(val)
+}
+
 func String(key string) string {
 	val := os.Getenv(key)
 	if len(val) < 1 {
