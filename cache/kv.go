@@ -13,7 +13,7 @@ type (
 		FromString(string) (*T, error)
 	}
 
-	RedisCache[T any] struct {
+	KeyValueCache[T any] struct {
 		client *redis.Client
 		ttl    time.Duration
 		vf     ValueFactory[T]
@@ -21,7 +21,7 @@ type (
 	}
 )
 
-func NewRedisCache[T any](conn string, ttl time.Duration, vf ValueFactory[T], logger *zap.Logger) *RedisCache[T] {
+func NewKeyValueCache[T any](conn string, ttl time.Duration, vf ValueFactory[T], logger *zap.Logger) *KeyValueCache[T] {
 	opts, err := redis.ParseURL(conn)
 	if err != nil {
 		panic(err)
@@ -29,7 +29,7 @@ func NewRedisCache[T any](conn string, ttl time.Duration, vf ValueFactory[T], lo
 
 	cln := redis.NewClient(opts)
 
-	return &RedisCache[T]{
+	return &KeyValueCache[T]{
 		client: cln,
 		ttl:    ttl,
 		vf:     vf,
@@ -37,11 +37,11 @@ func NewRedisCache[T any](conn string, ttl time.Duration, vf ValueFactory[T], lo
 	}
 }
 
-func (m *RedisCache[T]) Ping() error {
+func (m *KeyValueCache[T]) Ping() error {
 	return m.client.Ping(context.Background()).Err()
 }
 
-func (m *RedisCache[T]) Get(key string) *T {
+func (m *KeyValueCache[T]) Get(key string) *T {
 	v, err := m.client.Get(context.Background(), key).Result()
 	if err != nil {
 		if err == redis.Nil {
@@ -61,7 +61,7 @@ func (m *RedisCache[T]) Get(key string) *T {
 	return ret
 }
 
-func (m *RedisCache[T]) Set(key string, value T) {
+func (m *KeyValueCache[T]) Set(key string, value T) {
 	err := m.client.Set(context.Background(), key, value, m.ttl).Err()
 	if err != nil {
 		m.logger.Error("redis set", zap.Error(err))
