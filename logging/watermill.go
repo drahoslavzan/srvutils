@@ -12,7 +12,7 @@ type (
 )
 
 func NewWatermillZapLogger(logger *zap.Logger) watermill.LoggerAdapter {
-	return &WMZapLoggerAdapter{}
+	return &WMZapLoggerAdapter{logger}
 }
 
 func (m *WMZapLoggerAdapter) With(fields watermill.LogFields) watermill.LoggerAdapter {
