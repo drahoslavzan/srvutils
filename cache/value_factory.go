@@ -1,13 +1,13 @@
 package cache
 
 type (
-	StringValueFactory struct{}
+	stringValueFactory struct{}
 )
 
-func NewStringValueFactory() *StringValueFactory {
-	return &StringValueFactory{}
+func StringValueFactory() stringValueFactory {
+	return stringValueFactory{}
 }
 
-func (m *StringValueFactory) FromString(v string) (*string, error) {
+func (m stringValueFactory) FromString(v string) (*string, error) {
 	return &v, nil
 }
