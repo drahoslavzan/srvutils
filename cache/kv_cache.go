@@ -43,7 +43,7 @@ func (m *KVCache[T]) Ping() error {
 	return m.client.Ping(context.Background()).Err()
 }
 
-func (m *KVCache[T]) Get(key string) *T {
+func (m *KVCache[T]) TryGet(key string) *T {
 	v, err := m.client.Get(context.Background(), key).Result()
 	if err != nil {
 		if err == redis.Nil {
