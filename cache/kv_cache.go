@@ -78,3 +78,11 @@ func (m *KVCache[T]) SetWithTTL(key string, value T, ttl time.Duration) {
 		return
 	}
 }
+
+func (m *KVCache[T]) Delete(key string) {
+	err := m.client.Del(context.Background(), key).Err()
+	if err != nil {
+		m.logger.Error("redis delete", zap.Error(err))
+		return
+	}
+}

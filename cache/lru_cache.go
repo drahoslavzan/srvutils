@@ -33,3 +33,7 @@ func (m *LRUCache[T]) TryGet(key string) *T {
 func (m *LRUCache[T]) Set(key string, value T) {
 	m.cache.Add(key, value)
 }
+
+func (m *LRUCache[T]) Delete(key string) {
+	m.cache.Remove(key)
+}
