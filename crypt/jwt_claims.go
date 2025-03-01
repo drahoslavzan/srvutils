@@ -12,12 +12,11 @@ type (
 	JWTClaims jwt.MapClaims
 )
 
-// [sub] is the user ID
-// [aud] is the project ID
-func NewBasicJWTPayload(sub, aud string, data any) JWTClaims {
+func NewBasicJWTPayload(sub, aud, iss string, data any) JWTClaims {
 	claims := JWTClaims{
 		"sub": sub,
 		"aud": aud,
+		"iss": iss,
 	}
 
 	if data != nil {
