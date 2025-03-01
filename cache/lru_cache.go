@@ -22,12 +22,8 @@ func NewLRUCache[T any](sz int) *LRUCache[T] {
 	}
 }
 
-func (m *LRUCache[T]) TryGet(key string) *T {
-	if v, ok := m.cache.Get(key); ok {
-		return &v
-	}
-
-	return nil
+func (m *LRUCache[T]) Get(key string) (value T, ok bool) {
+	return m.cache.Get(key)
 }
 
 func (m *LRUCache[T]) Set(key string, value T) {

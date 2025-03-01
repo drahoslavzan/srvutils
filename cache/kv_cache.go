@@ -10,7 +10,8 @@ import (
 
 type (
 	ValueFactory[T any] interface {
-		FromString(string) (*T, error)
+		FromString(string) (T, error)
+		ToString(T) string
 	}
 
 	KVCache[T any] struct {
@@ -43,28 +44,27 @@ func (m *KVCache[T]) Ping() error {
 	return m.client.Ping(context.Background()).Err()
 }
 
-func (m *KVCache[T]) TryGet(key string) *T {
+func (m *KVCache[T]) Get(key string) (value T, ok bool) {
 	v, err := m.client.Get(context.Background(), key).Result()
 	if err != nil {
-		if err == redis.Nil {
-			return nil
+		if err != redis.Nil {
+			m.logger.Error("redis get", zap.Error(err))
 		}
 
-		m.logger.Error("redis get", zap.Error(err))
-		return nil
+		return
 	}
 
 	ret, err := m.vf.FromString(v)
 	if err != nil {
 		m.logger.Error("value factory from string", zap.Error(err))
-		return nil
+		return
 	}
 
-	return ret
+	return ret, true
 }
 
 func (m *KVCache[T]) Set(key string, value T) {
-	err := m.client.Set(context.Background(), key, value, m.ttl).Err()
+	err := m.client.Set(context.Background(), key, m.vf.ToString(value), m.ttl).Err()
 	if err != nil {
 		m.logger.Error("redis set", zap.Error(err))
 		return
