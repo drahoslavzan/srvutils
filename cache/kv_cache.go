@@ -27,7 +27,7 @@ const NoTTL = time.Duration(0)
 func NewRedisCache[T any](conn string, ttl time.Duration, vf ValueFactory[T], logger *zap.Logger) *KVCache[T] {
 	opts, err := redis.ParseURL(conn)
 	if err != nil {
-		panic(err)
+		logger.Panic("redis parse", zap.Error(err))
 	}
 
 	cln := redis.NewClient(opts)
