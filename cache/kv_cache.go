@@ -24,20 +24,21 @@ type (
 
 const NoTTL = time.Duration(0)
 
-func NewRedisCache[T any](conn string, ttl time.Duration, vf ValueFactory[T], logger *zap.Logger) *KVCache[T] {
+func NewRedisCache[T any](conn string, ttl time.Duration, vf ValueFactory[T], logger *zap.Logger) (*KVCache[T], error) {
 	opts, err := redis.ParseURL(conn)
 	if err != nil {
-		logger.Panic("redis parse", zap.Error(err))
+		return nil, err
 	}
 
 	cln := redis.NewClient(opts)
-
-	return &KVCache[T]{
+	ret := &KVCache[T]{
 		client: cln,
 		ttl:    ttl,
 		vf:     vf,
 		logger: logger,
 	}
+
+	return ret, nil
 }
 
 func (m *KVCache[T]) Ping() error {
@@ -50,7 +51,6 @@ func (m *KVCache[T]) Get(key string) (value T, ok bool) {
 		if err != redis.Nil {
 			m.logger.Error("redis get", zap.Error(err))
 		}
-
 		return
 	}
 

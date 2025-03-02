@@ -12,19 +12,19 @@ type (
 	loggerKey struct{}
 )
 
-func NewLoggerMiddleware(logger *zap.Logger) func(http.Handler) http.Handler {
+func Middleware(logger *zap.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx := Replace(r.Context(), logger)
+			ctx := ReplaceLogger(r.Context(), logger)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
 }
 
-func NewTraceLoggerMiddleware(logger *zap.Logger) func(http.Handler) http.Handler {
+func TraceMiddleware(logger *zap.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx := Replace(r.Context(), logger.WithLazy(
+			ctx := ReplaceLogger(r.Context(), logger.WithLazy(
 				zap.String("requestId", uuid.NewString()),
 			))
 
@@ -33,11 +33,11 @@ func NewTraceLoggerMiddleware(logger *zap.Logger) func(http.Handler) http.Handle
 	}
 }
 
-func Replace(ctx context.Context, logger *zap.Logger) context.Context {
+func ReplaceLogger(ctx context.Context, logger *zap.Logger) context.Context {
 	return context.WithValue(ctx, loggerKey{}, logger)
 }
 
-func MustFromContext(ctx context.Context) *zap.Logger {
+func MustLoggerFromContext(ctx context.Context) *zap.Logger {
 	logger, ok := ctx.Value(loggerKey{}).(*zap.Logger)
 	if !ok {
 		zap.L().Panic("logger instance not provided")

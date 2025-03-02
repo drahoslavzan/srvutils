@@ -1,4 +1,4 @@
-package netutils
+package remote
 
 import (
 	"net"
@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func GetRemoteHost(r *http.Request, forwarding bool) string {
+func HostFromRequest(r *http.Request, forwarding bool) string {
 	host, _, _ := net.SplitHostPort(r.RemoteAddr)
 	if !forwarding {
 		return host

@@ -88,7 +88,6 @@ func (m *gsaTokenParser) Parse(token string) (JWTClaims, error) {
 
 		return pubKey, nil
 	})
-
 	if err != nil {
 		return nil, err
 	}

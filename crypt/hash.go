@@ -11,11 +11,13 @@ func MakeHash(text string) Hash {
 	if err != nil {
 		panic(err)
 	}
+
 	return Hash(hash)
 }
 
 func (m Hash) Equals(plain string) bool {
 	byteHash := []byte(m)
 	err := bcrypt.CompareHashAndPassword(byteHash, []byte(plain))
+
 	return err == nil
 }

@@ -12,7 +12,7 @@ type (
 	JWTClaims jwt.MapClaims
 )
 
-func NewBasicJWTPayload(sub, aud, iss string, data any) JWTClaims {
+func BasicJWTPayload(sub, aud, iss string, data any) JWTClaims {
 	claims := JWTClaims{
 		"sub": sub,
 		"aud": aud,
@@ -32,6 +32,10 @@ func (m JWTClaims) Subject() (string, error) {
 
 func (m JWTClaims) Audience() ([]string, error) {
 	return jwt.MapClaims(m).GetAudience()
+}
+
+func (m JWTClaims) Issuer() (string, error) {
+	return jwt.MapClaims(m).GetIssuer()
 }
 
 func makeClaims(payload JWTClaims, exp time.Duration) jwt.MapClaims {
