@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"go.uber.org/zap"
 )
 
 type (
@@ -20,16 +19,18 @@ type (
 	}
 )
 
-func NewRSASigner(privateKey []byte, exp time.Duration) *RSASigner {
+func NewRSASigner(privateKey []byte, exp time.Duration) (*RSASigner, error) {
 	priKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKey)
 	if err != nil {
-		zap.L().Panic("invalid private key", zap.Error(err))
+		return nil, err
 	}
 
-	return &RSASigner{
+	ret := &RSASigner{
 		priKey: priKey,
 		exp:    exp,
 	}
+
+	return ret, nil
 }
 
 func (m *RSASigner) Sign(payload JWTClaims) (string, error) {
@@ -38,15 +39,17 @@ func (m *RSASigner) Sign(payload JWTClaims) (string, error) {
 	return token.SignedString(m.priKey)
 }
 
-func NewRSAParser(publicKey []byte) *RSAParser {
+func NewRSAParser(publicKey []byte) (*RSAParser, error) {
 	pubKey, err := jwt.ParseRSAPublicKeyFromPEM(publicKey)
 	if err != nil {
-		zap.L().Panic("invalid public key", zap.Error(err))
+		return nil, err
 	}
 
-	return &RSAParser{
+	ret := &RSAParser{
 		pubKey: pubKey,
 	}
+
+	return ret, nil
 }
 
 func (m *RSAParser) Parse(token string) (JWTClaims, error) {
