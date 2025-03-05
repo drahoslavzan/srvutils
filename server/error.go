@@ -22,20 +22,14 @@ func NewError(msg string) *Error {
 
 // Customer facing error message translatable using code.
 func (m *Error) WithCode(code string) *Error {
-	return &Error{
-		Code:    code,
-		Message: m.Message,
-		Field:   m.Field,
-	}
+	m.Code = code
+	return m
 }
 
 // Customer facing error message for the provided field.
 func (m *Error) OnField(field string) *Error {
-	return &Error{
-		Field:   field,
-		Code:    m.Code,
-		Message: m.Message,
-	}
+	m.Field = field
+	return m
 }
 
 func (m *Error) Error() string {
