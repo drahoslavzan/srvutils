@@ -1,8 +1,7 @@
-package srverr
+package server
 
 import (
 	"context"
-	"errors"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/vektah/gqlparser/v2/gqlerror"
@@ -22,19 +21,20 @@ func NewError(msg string) *Error {
 }
 
 // Customer facing error message translatable using code.
-func NewCodeError(msg, code string) *Error {
+func (m *Error) WithCode(code string) *Error {
 	return &Error{
 		Code:    code,
-		Message: msg,
+		Message: m.Message,
+		Field:   m.Field,
 	}
 }
 
 // Customer facing error message for the provided field.
-func NewCodeFieldError(msg, code, field string) *Error {
+func (m *Error) OnField(field string) *Error {
 	return &Error{
-		Code:    code,
 		Field:   field,
-		Message: msg,
+		Code:    m.Code,
+		Message: m.Message,
 	}
 }
 
@@ -45,17 +45,13 @@ func (m *Error) Error() string {
 func (m *Error) FormatGQL(ctx context.Context) *gqlerror.Error {
 	e := graphql.DefaultErrorPresenter(ctx, m)
 
-	var se *Error
-	if errors.As(e, &se) {
-		e.Message = se.Message
-		e.Extensions = make(map[string]any)
-
-		if len(se.Code) > 0 {
-			e.Extensions["code"] = se.Code
-		}
-		if len(se.Field) > 0 {
-			e.Extensions["field"] = se.Field
-		}
+	e.Message = m.Message
+	e.Extensions = make(map[string]any)
+	if len(m.Code) > 0 {
+		e.Extensions["code"] = m.Code
+	}
+	if len(m.Field) > 0 {
+		e.Extensions["field"] = m.Field
 	}
 
 	return e
