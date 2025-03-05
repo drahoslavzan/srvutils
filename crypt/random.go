@@ -20,9 +20,13 @@ var (
 )
 
 func MakeRandom(length int, charset CharSet, prefix string) string {
+	if length <= 0 {
+		return ""
+	}
+
 	b := make([]byte, length)
 	for i := range b {
-		b[i] = charset[seededRand.Intn(len(charset)-1)]
+		b[i] = charset[seededRand.Intn(len(charset))]
 	}
 
 	return prefix + string(b)

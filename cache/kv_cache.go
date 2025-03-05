@@ -11,7 +11,7 @@ import (
 type (
 	ValueFactory[T any] interface {
 		FromString(string) (T, error)
-		ToString(T) string
+		ToString(T) (string, error)
 	}
 
 	KVCache[T any] struct {
@@ -64,7 +64,13 @@ func (m *KVCache[T]) Get(key string) (value T, ok bool) {
 }
 
 func (m *KVCache[T]) Set(key string, value T) {
-	err := m.client.Set(context.Background(), key, m.vf.ToString(value), m.ttl).Err()
+	str, err := m.vf.ToString(value)
+	if err != nil {
+		m.logger.Error("value to string", zap.Error(err))
+		return
+	}
+
+	err = m.client.Set(context.Background(), key, str, m.ttl).Err()
 	if err != nil {
 		m.logger.Error("redis set", zap.Error(err))
 		return
@@ -72,7 +78,13 @@ func (m *KVCache[T]) Set(key string, value T) {
 }
 
 func (m *KVCache[T]) SetWithTTL(key string, value T, ttl time.Duration) {
-	err := m.client.Set(context.Background(), key, value, ttl).Err()
+	str, err := m.vf.ToString(value)
+	if err != nil {
+		m.logger.Error("value to string", zap.Error(err))
+		return
+	}
+
+	err = m.client.Set(context.Background(), key, str, ttl).Err()
 	if err != nil {
 		m.logger.Error("redis set", zap.Error(err))
 		return

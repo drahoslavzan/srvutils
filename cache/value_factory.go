@@ -16,8 +16,8 @@ func (m stringValueFactory) FromString(v string) (string, error) {
 	return v, nil
 }
 
-func (m stringValueFactory) ToString(v string) string {
-	return v
+func (m stringValueFactory) ToString(v string) (string, error) {
+	return v, nil
 }
 
 func JSONValueFactory[T any]() ValueFactory[T] {
@@ -30,11 +30,11 @@ func (m jsonValueFactory[T]) FromString(v string) (T, error) {
 	return value, err
 }
 
-func (m jsonValueFactory[T]) ToString(v T) string {
+func (m jsonValueFactory[T]) ToString(v T) (string, error) {
 	value, err := json.Marshal(v)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
-	return string(value)
+	return string(value), nil
 }

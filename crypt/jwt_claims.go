@@ -39,7 +39,7 @@ func (m JWTClaims) Issuer() (string, error) {
 }
 
 func makeClaims(payload JWTClaims, exp time.Duration) jwt.MapClaims {
-	now := time.Now()
+	now := time.Now().UTC()
 	claims := jwt.MapClaims{
 		"iat": now.Unix(),
 		"exp": now.Add(exp).Unix(),

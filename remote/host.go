@@ -12,7 +12,7 @@ func HostFromRequest(r *http.Request, forwarding bool) string {
 		return host
 	}
 
-	if xff := strings.Trim(r.Header.Get("X-Forwarded-For"), ","); len(xff) > 0 {
+	if xff := strings.Trim(r.Header.Get("X-Forwarded-For"), ", "); len(xff) > 0 {
 		addrs := strings.Split(xff, ",")
 		lastFwd := addrs[len(addrs)-1]
 		if ip := net.ParseIP(lastFwd); ip != nil {
