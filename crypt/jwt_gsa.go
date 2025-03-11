@@ -3,6 +3,7 @@ package crypt
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"sync"
 	"time"
@@ -88,7 +89,7 @@ func (m *gsaTokenParser) Parse(token string) (JWTClaims, error) {
 
 		pubKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(pk))
 		if err != nil {
-			return nil, errors.New("invalid public key")
+			return nil, fmt.Errorf("invalid public key: %s", pk)
 		}
 
 		return pubKey, nil
