@@ -60,6 +60,11 @@ func (m *gsaTokenParser) FetchKeys() error {
 }
 
 func (m *gsaTokenParser) Parse(token string) (JWTClaims, error) {
+	opts := []jwt.ParserOption{
+		jwt.WithValidMethods([]string{"RS256"}),
+		jwt.WithExpirationRequired(),
+	}
+
 	t, err := jwt.Parse(token, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, errors.New("unexpected signing method")
@@ -87,7 +92,7 @@ func (m *gsaTokenParser) Parse(token string) (JWTClaims, error) {
 		}
 
 		return pubKey, nil
-	})
+	}, opts...)
 	if err != nil {
 		return nil, err
 	}
