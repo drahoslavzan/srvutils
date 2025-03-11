@@ -1,10 +1,9 @@
 package crypt
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
+
 	"sync"
 	"time"
 
@@ -12,52 +11,29 @@ import (
 )
 
 type (
+	KeyFetcher interface {
+		FetchKeys(url string) (map[string]string, error)
+		LoadFromCache(url string) (map[string]string, error)
+	}
+
 	gsaTokenParser struct {
 		url       string
+		fetcher   KeyFetcher
 		pubKeys   map[string]string
 		mut       sync.RWMutex
 		lastFetch time.Time
 	}
 )
 
-func newGSATokenParser(url string) *gsaTokenParser {
+const fetchDelay = 5 * time.Minute
+
+func NewGSATokenParser(url string, fetcher KeyFetcher) *gsaTokenParser {
+	fetcher.LoadFromCache(url)
+
 	return &gsaTokenParser{
-		url: url,
+		url:     url,
+		fetcher: fetcher,
 	}
-}
-
-func (m *gsaTokenParser) KeyByID(id string) []byte {
-	m.mut.RLock()
-	defer m.mut.RUnlock()
-
-	return []byte(m.pubKeys[id])
-}
-
-func (m *gsaTokenParser) FetchKeys() error {
-	m.mut.Lock()
-	defer m.mut.Unlock()
-
-	if m.lastFetch.Add(fetchDelay).After(time.Now()) {
-		// recently fetched
-		return nil
-	}
-
-	res, err := http.Get(m.url)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-
-	var keys map[string]string
-	jd := json.NewDecoder(res.Body)
-	if err := jd.Decode(&keys); err != nil {
-		return err
-	}
-
-	m.pubKeys = keys
-	m.lastFetch = time.Now()
-
-	return nil
 }
 
 func (m *gsaTokenParser) Parse(token string) (JWTClaims, error) {
@@ -76,12 +52,12 @@ func (m *gsaTokenParser) Parse(token string) (JWTClaims, error) {
 			return nil, errors.New("invalid key id")
 		}
 
-		pk := m.KeyByID(kid)
-		if pk == nil {
-			if err := m.FetchKeys(); err != nil {
+		pk := m.keyByID(kid)
+		if len(pk) < 1 {
+			if err := m.fetchKeys(); err != nil {
 				return nil, err
 			}
-			pk = m.KeyByID(kid)
+			pk = m.keyByID(kid)
 			if pk == nil {
 				return nil, errors.New("public key not found")
 			}
@@ -105,4 +81,29 @@ func (m *gsaTokenParser) Parse(token string) (JWTClaims, error) {
 	return nil, errors.New("invalid token")
 }
 
-const fetchDelay = 5 * time.Minute
+func (m *gsaTokenParser) keyByID(id string) []byte {
+	m.mut.RLock()
+	defer m.mut.RUnlock()
+
+	return []byte(m.pubKeys[id])
+}
+
+func (m *gsaTokenParser) fetchKeys() error {
+	m.mut.Lock()
+	defer m.mut.Unlock()
+
+	if m.lastFetch.Add(fetchDelay).After(time.Now()) {
+		// recently fetched
+		return nil
+	}
+
+	keys, err := m.fetcher.FetchKeys(m.url)
+	if err != nil {
+		return err
+	}
+
+	m.pubKeys = keys
+	m.lastFetch = time.Now()
+
+	return nil
+}
