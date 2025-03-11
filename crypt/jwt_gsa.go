@@ -16,7 +16,7 @@ type (
 		LoadFromCache(url string) (map[string]string, error)
 	}
 
-	gsaTokenParser struct {
+	GSATokenParser struct {
 		url       string
 		fetcher   KeyFetcher
 		pubKeys   map[string]string
@@ -27,16 +27,16 @@ type (
 
 const fetchDelay = 5 * time.Minute
 
-func NewGSATokenParser(url string, fetcher KeyFetcher) *gsaTokenParser {
+func NewGSATokenParser(url string, fetcher KeyFetcher) *GSATokenParser {
 	fetcher.LoadFromCache(url)
 
-	return &gsaTokenParser{
+	return &GSATokenParser{
 		url:     url,
 		fetcher: fetcher,
 	}
 }
 
-func (m *gsaTokenParser) Parse(token string) (JWTClaims, error) {
+func (m *GSATokenParser) Parse(token string) (JWTClaims, error) {
 	opts := []jwt.ParserOption{
 		jwt.WithValidMethods([]string{"RS256"}),
 		jwt.WithExpirationRequired(),
@@ -81,14 +81,14 @@ func (m *gsaTokenParser) Parse(token string) (JWTClaims, error) {
 	return nil, errors.New("invalid token")
 }
 
-func (m *gsaTokenParser) keyByID(id string) []byte {
+func (m *GSATokenParser) keyByID(id string) []byte {
 	m.mut.RLock()
 	defer m.mut.RUnlock()
 
 	return []byte(m.pubKeys[id])
 }
 
-func (m *gsaTokenParser) fetchKeys() error {
+func (m *GSATokenParser) fetchKeys() error {
 	m.mut.Lock()
 	defer m.mut.Unlock()
 
