@@ -4,57 +4,51 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"encoding/base64"
+	"errors"
 	"io"
 )
 
-// Encrypt data using AES-GCM
-func EncryptAES(text string, key []byte) (ct string, nonce string, err error) {
+func EncryptAES(plaintext string, key []byte) ([]byte, error) {
+	plaintextBytes := []byte(plaintext)
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		return "", "", err
+		return nil, err
 	}
 
-	aesGCM, err := cipher.NewGCM(block)
+	gcm, err := cipher.NewGCM(block)
 	if err != nil {
-		return "", "", err
+		return nil, err
 	}
 
-	nb := make([]byte, aesGCM.NonceSize())
-	if _, err := io.ReadFull(rand.Reader, nb); err != nil {
-		return "", "", err
+	nonce := make([]byte, gcm.NonceSize())
+	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
+		return nil, err
 	}
 
-	cipherText := aesGCM.Seal(nil, nb, []byte(text), nil)
-	return base64.StdEncoding.EncodeToString(cipherText), base64.StdEncoding.EncodeToString(nb), nil
+	return gcm.Seal(nonce, nonce, plaintextBytes, nil), nil
 }
 
-// Decrypt data using AES-GCM
-func DecryptAES(ct, nonce string, key []byte) (string, error) {
-	data, err := base64.StdEncoding.DecodeString(ct)
-	if err != nil {
-		return "", err
-	}
-
-	nonceBytes, err := base64.StdEncoding.DecodeString(nonce)
-	if err != nil {
-		return "", err
-	}
-
+func DecryptAES(ciphertext []byte, key []byte) (string, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return "", err
 	}
 
-	aesGCM, err := cipher.NewGCM(block)
+	gcm, err := cipher.NewGCM(block)
 	if err != nil {
 		return "", err
 	}
 
-	plaintext, err := aesGCM.Open(nil, nonceBytes, data, nil)
+	nonceSize := gcm.NonceSize()
+	if len(ciphertext) < nonceSize {
+		return "", errors.New("ciphertext too short")
+	}
+	nonce, ciphertextBytes := ciphertext[:nonceSize], ciphertext[nonceSize:]
+
+	plaintextBytes, err := gcm.Open(nil, nonce, ciphertextBytes, nil)
 	if err != nil {
 		return "", err
 	}
 
-	return string(plaintext), nil
+	return string(plaintextBytes), nil
 }
