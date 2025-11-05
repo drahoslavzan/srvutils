@@ -117,19 +117,19 @@ func (m *Client) Post(url string, data []byte, header http.Header) (io.ReadClose
 	return res.Body, res.StatusCode, nil
 }
 
-func (m *Client) RetryGet(url string, log *zap.SugaredLogger) (io.ReadCloser, int, error) {
-	return m.retry(url, m.Get, log)
+func (m *Client) RetryGet(url string, logger *zap.Logger) (io.ReadCloser, int, error) {
+	return m.retry(url, m.Get, logger)
 }
 
-func (m *Client) RetryPost(url string, data []byte, header http.Header, log *zap.SugaredLogger) (io.ReadCloser, int, error) {
+func (m *Client) RetryPost(url string, data []byte, header http.Header, logger *zap.Logger) (io.ReadCloser, int, error) {
 	fn := func(url string) (io.ReadCloser, int, error) {
 		return m.Post(url, data, header)
 	}
 
-	return m.retry(url, fn, log)
+	return m.retry(url, fn, logger)
 }
 
-func (m *Client) retry(url string, fn func(url string) (io.ReadCloser, int, error), log *zap.SugaredLogger) (io.ReadCloser, int, error) {
+func (m *Client) retry(url string, fn func(url string) (io.ReadCloser, int, error), logger *zap.Logger) (io.ReadCloser, int, error) {
 	var lastErr error
 	for i := 0; i < m.cfg.MaxRetries; i++ {
 		body, status, err := fn(url)
@@ -140,7 +140,7 @@ func (m *Client) retry(url string, fn func(url string) (io.ReadCloser, int, erro
 			return body, status, err
 		}
 
-		log.Warnw("request failed", "url", url, err)
+		logger.Warn("request failed", zap.String("url", url), zap.Error(err))
 
 		backoff := time.Duration((1<<i)*500) * time.Millisecond  // exponential base
 		jitter := time.Duration(rand.Int63n(int64(backoff / 2))) // up to 50% jitter
