@@ -115,6 +115,8 @@ func durationForKey(key string) time.Duration {
 
 	s := strings.ToLower(key[idx+1:])
 	switch s {
+	case "ms", "millis", "milliseconds":
+		return time.Millisecond
 	case "s", "secs", "seconds":
 		return time.Second
 	case "m", "mins", "minutes":
