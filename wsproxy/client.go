@@ -33,6 +33,7 @@ func NewHttpProxyClient(proxyURL string, cfg *Config) (*Client, error) {
 
 	client := &http.Client{
 		Transport: transport,
+		Timeout:   cfg.Timeout,
 	}
 
 	cln := &Client{
