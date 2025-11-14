@@ -30,6 +30,11 @@ func (m *ProxyList) List() []string {
 	return m.list
 }
 
+func (m *ProxyList) TruncateTo(v int) {
+	cnt := max(0, min(v, len(m.list)))
+	m.list = m.list[:cnt]
+}
+
 func (m *ProxyList) Clients(cfg *Config) (*ProxyClients, error) {
 	clients := make([]*Client, len(m.list))
 	for i, url := range m.list {
