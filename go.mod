@@ -3,7 +3,7 @@ module github.com/drahoslavzan/srvutils
 go 1.24.0
 
 require (
-	github.com/99designs/gqlgen v0.17.81
+	github.com/99designs/gqlgen v0.17.83
 	github.com/ThreeDotsLabs/watermill v1.5.1
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/golang-jwt/jwt/v5 v5.3.0
@@ -11,8 +11,8 @@ require (
 	github.com/redis/go-redis/v9 v9.16.0
 	github.com/vektah/gqlparser/v2 v2.5.31
 	go.uber.org/zap v1.27.0
-	golang.org/x/crypto v0.43.0
-	golang.org/x/net v0.45.0
+	golang.org/x/crypto v0.44.0
+	golang.org/x/net v0.47.0
 )
 
 require (
