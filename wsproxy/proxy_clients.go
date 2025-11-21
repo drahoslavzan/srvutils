@@ -14,7 +14,12 @@ type (
 )
 
 func (m *ProxyClients) Remove(client *Client) {
-	new := make([]*Client, 0, len(m.clients)-1)
+	sz := len(m.clients)
+	if sz < 1 {
+		return
+	}
+
+	new := make([]*Client, 0, sz-1)
 	for _, c := range m.clients {
 		if c == client {
 			continue
