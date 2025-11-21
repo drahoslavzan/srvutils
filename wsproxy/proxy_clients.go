@@ -18,6 +18,9 @@ func (m *ProxyClients) Remove(client *Client) {
 	if sz < 1 {
 		return
 	}
+	if client == nil {
+		return
+	}
 
 	new := make([]*Client, 0, sz-1)
 	for _, c := range m.clients {
